@@ -1,15 +1,6 @@
 package fr.umontpellier.iut.trains;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import fr.umontpellier.iut.graphes.Graphe;
@@ -405,7 +396,22 @@ public class Jeu implements Runnable {
      * @return le graphe des tuiles du jeu (sans les tuiles Mer)
      */
     public Graphe getGraphe() {
-        throw new RuntimeException("Méthode à implémenter");
+        HashMap<Tuile, Sommet> map = new HashMap<>();
+        for (Tuile tuile : getTuiles()) {
+            map.put(tuile, new Sommet(tuile, this));
+        }
+        Set<Sommet> sommets = new HashSet<>();
+        for (Tuile tuile : getTuiles()) {
+            if (!tuile.estMer()) {
+                for (Tuile voisin : tuile.getVoisines()){
+                    if (!tuile.estMer()) {
+                        map.get(tuile).ajouterVoisin(map.get(voisin));
+                    }
+                }
+                sommets.add(map.get(tuile));
+            }
+        }
+        return new Graphe(sommets);
     }
 
     /**
