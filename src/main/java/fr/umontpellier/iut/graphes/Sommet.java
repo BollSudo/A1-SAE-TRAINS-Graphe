@@ -46,7 +46,16 @@ public class Sommet {
 
 
     public Sommet(Tuile tuile, Jeu jeu) {
-        throw new RuntimeException("Méthode à implémenter");
+        i = jeu.getTuiles().indexOf(tuile);
+        surcout = tuile.getSurcout();
+        joueurs = new HashSet<>();
+        for (int j = 0; j < jeu.getJoueurs().size() ; j++) {
+            if (tuile.hasRail(jeu.getJoueurs().get(j))) {
+                joueurs.add(j);
+            }
+        }
+        nbPointsVictoire = tuile.getNbPointsVictoire();
+        voisins = new HashSet<>();
     }
 
     /**
