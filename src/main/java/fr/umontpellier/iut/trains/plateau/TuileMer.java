@@ -16,4 +16,9 @@ public class TuileMer extends Tuile {
     public boolean peutEtrePositionDepart() {
         return false;
     }
+
+    @Override
+    public boolean estMer(){
+        return true;
+    }
 }

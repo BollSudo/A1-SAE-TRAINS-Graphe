@@ -111,4 +111,8 @@ public abstract class Tuile {
     public List<Tuile> getVoisines() {
         return voisines;
     }
+
+    public boolean estMer(){
+        return false;
+    }
 }
