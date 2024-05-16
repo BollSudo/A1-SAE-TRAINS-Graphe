@@ -90,7 +90,7 @@ public class Sommet {
     }
 
     public boolean estVoisin(Sommet sommet) {
-        throw new RuntimeException("Méthode à implémenter");
+       return voisins.contains(sommet);
     }
 
     @Override
