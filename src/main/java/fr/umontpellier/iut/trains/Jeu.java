@@ -404,7 +404,7 @@ public class Jeu implements Runnable {
         for (Tuile tuile : getTuiles()) {
             if (!tuile.estMer()) {
                 for (Tuile voisin : tuile.getVoisines()){
-                    if (!tuile.estMer()) {
+                    if (!voisin.estMer()) {
                         map.get(tuile).ajouterVoisin(map.get(voisin));
                     }
                 }
@@ -428,7 +428,7 @@ public class Jeu implements Runnable {
         for (Tuile tuile : getTuiles()) {
             if (!tuile.estMer() && tuile.hasRail(joueur)) {
                 for (Tuile voisin : tuile.getVoisines()){
-                    if (!tuile.estMer()&& tuile.hasRail(joueur)) {
+                    if (!voisin.estMer() && voisin.hasRail(joueur)) {
                         map.get(tuile).ajouterVoisin(map.get(voisin));
                     }
                 }
