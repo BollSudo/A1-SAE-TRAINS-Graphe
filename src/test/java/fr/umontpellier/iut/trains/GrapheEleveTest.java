@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 
+import javax.sound.midi.Sequence;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
@@ -72,7 +75,21 @@ public class GrapheEleveTest {
     @Disabled
     @Test
     public void test_sequenceEstGraphe(){
-        throw new RuntimeException("Pas encore implémenter");
+        List<Integer> suiteVide = new ArrayList<>();
+        List<Integer> suite1sommetValide = new ArrayList<>();
+        List<Integer> suite1sommetInvalide = new ArrayList<>();
+        List<Integer> suite5sommetValide = new ArrayList<>();
+        List<Integer> suite5sommetInvalide = new ArrayList<>();
+        suite1sommetValide.add(0);
+        suite1sommetInvalide.add(2);
+        suite5sommetValide.add(1);suite5sommetValide.add(1);suite5sommetValide.add(1);suite5sommetValide.add(1);suite5sommetValide.add(4);
+        suite5sommetInvalide.add(0);suite5sommetInvalide.add(4);suite5sommetInvalide.add(4);suite5sommetInvalide.add(4);suite5sommetInvalide.add(4);
+
+        assertTrue(Graphe.sequenceEstGraphe(suiteVide));
+        assertTrue(Graphe.sequenceEstGraphe(suite1sommetValide));
+        assertFalse(Graphe.sequenceEstGraphe(suite1sommetInvalide));
+        assertTrue(Graphe.sequenceEstGraphe(suite5sommetValide));
+        assertFalse(Graphe.sequenceEstGraphe(suite5sommetInvalide));
     }
 
 }

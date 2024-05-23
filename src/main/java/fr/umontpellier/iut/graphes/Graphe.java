@@ -55,7 +55,15 @@ public class Graphe {
      * Pré-requis : on peut supposer que la séquence est triée dans l'ordre croissant.
      */
     public static boolean sequenceEstGraphe(List<Integer> sequence) {
-        throw new RuntimeException("Méthode à implémenter");
+        double somme = 0;
+        int max = 0;
+        int taille = 0;
+        for (int x : sequence){
+            somme = somme + x;
+            if (x > max) max = x;
+            if (x != 0) taille = taille + 1;
+        }
+        return (somme / 2 == (double) (int) somme / 2 && !(max >= taille)) || sequence.isEmpty() || taille == 0;
     }
 
     /**
