@@ -95,7 +95,10 @@ public class Sommet {
     }
 
     public void ajouterVoisin(Sommet voisin) {
-        voisins.add(voisin);
+        if (voisin != this) {
+            voisins.add(voisin);
+            voisin.getVoisins().add(this);
+        }
     }
 
     public boolean estVoisin(Sommet sommet) {

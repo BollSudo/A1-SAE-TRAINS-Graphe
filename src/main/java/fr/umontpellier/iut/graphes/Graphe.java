@@ -10,7 +10,7 @@ import java.util.*;
  */
 
 public class Graphe {
-    public static Sommet.SommetBuilder sommetBuilder;
+    public static Sommet.SommetBuilder sommetBuilder = new Sommet.SommetBuilder();
     private final Set<Sommet> sommets;
 
     public Graphe(Set<Sommet> sommets) {
@@ -150,7 +150,7 @@ public class Graphe {
      * @return le degré du sommet {@code s}
      */
     public int degre(Sommet s) {
-        throw new RuntimeException("Méthode à implémenter");
+        return s.getVoisins().size();
     }
 
     /**
