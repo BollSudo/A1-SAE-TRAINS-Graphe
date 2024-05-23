@@ -31,7 +31,7 @@ public class Graphe {
      * Construit un graphe vide
      */
     public Graphe() {
-        throw new RuntimeException("Méthode à implémenter");
+        this(0);
     }
 
     /**
@@ -43,7 +43,10 @@ public class Graphe {
      *          même si en principe ce n'est pas obligatoire)
      */
     public Graphe(Graphe g, Set<Sommet> X) {
-        throw new RuntimeException("Méthode à implémenter");
+        sommets = new HashSet<>();
+        for (Sommet s : X){
+            ajouterSommet(g.getSommet(s.getIndice()));
+        }
     }
 
     /**
