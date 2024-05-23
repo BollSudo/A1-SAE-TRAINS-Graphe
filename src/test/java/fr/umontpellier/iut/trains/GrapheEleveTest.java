@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Timeout(value = 1, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
 public class GrapheEleveTest {
@@ -24,26 +23,19 @@ public class GrapheEleveTest {
         g = new Graphe();
     }
 
-    public void initUnSommet() {
-        initVide();
-        g.ajouterSommet(1);
+    public void initSommet(int i) {
+        g = new Graphe(i);
     }
 
-    public void init5voisinsEntreEux(){
-        g = new Graphe(5);
-        for (int s = 0; s<5; s++){
-            for (int v = 0; v < 5; v++){
-                if (v != s){
-                    g.getSommet(s).ajouterVoisin(g.getSommet(v));
-                }
-            }
+    public void relierUnSommetATous(Sommet s){
+        for (Sommet v : g.getSommets()) {
+            s.ajouterVoisin(v);
         }
     }
 
-    public void init5voisinUnPoint(){
-        g = new Graphe(5);
-        for (int v = 1; v<5; v++){
-            g.getSommet(0).ajouterVoisin(g.getSommet(v));
+    public void relierAllSommets() {
+        for (Sommet s : g.getSommets()) {
+            relierUnSommetATous(s);
         }
     }
 
@@ -51,25 +43,55 @@ public class GrapheEleveTest {
     @Disabled
     @Test
     public void test_degre() {
-        initUnSommet();
-        g.ajouterSommet(1);
-        g.ajouterSommet(2);
-        g.ajouterSommet(3);
-        g.ajouterSommet(4);
+        initSommet(4);
+        Sommet s0 = g.getSommet(0);
         Sommet s1 = g.getSommet(1);
         Sommet s2 = g.getSommet(2);
         Sommet s3 = g.getSommet(3);
-        Sommet s4 = g.getSommet(4);
 
+        s1.ajouterVoisin(s0);
         s1.ajouterVoisin(s2);
-        s1.ajouterVoisin(s4);
 
-        assertTrue(s1.getVoisins().containsAll(Set.of(s2, s4)));
+        assertTrue(s1.getVoisins().containsAll(Set.of(s2, s0)));
+        assertIterableEquals(s1.getVoisins(), Set.of(s2, s0));
         assertFalse(s1.getVoisins().contains(s3));
+        assertEquals(1, g.degre(s0));
         assertEquals(2, g.degre(s1));
         assertEquals(1, g.degre(s2));
         assertEquals(0, g.degre(s3));
-        assertEquals(1, g.degre(s4));
+    }
+
+    // @Disabled
+    @Test
+    public void test_estComplet_vrai() {
+        initSommet(4);
+        relierAllSommets();
+
+        for (Sommet s : g.getSommets()) {
+            assertEquals(3, s.getVoisins().size());
+        }
+        assertEquals(g.getNbAretes(), 6);
+        assertEquals(g.getNbSommets(), 4);
+        assertTrue(g.estComplet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_estComplet_false() {
+        initSommet(4);
+        relierUnSommetATous(g.getSommet(0));
+
+        assertEquals(3, g.getSommet(0).getVoisins().size());
+        assertEquals(3, g.getNbAretes());
+        assertEquals(4, g.getNbSommets());
+        assertFalse(g.estComplet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_estComplet_g_vide() {
+        initVide();
+        assertTrue(g.estComplet());
     }
 
     @Disabled

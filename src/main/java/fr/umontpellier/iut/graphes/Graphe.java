@@ -165,7 +165,8 @@ public class Graphe {
      * @return true si et seulement si this est complet.
      */
     public boolean estComplet() {
-        throw new RuntimeException("Méthode à implémenter");
+        int n = getNbSommets();
+        return getNbAretes() == n * (n-1) / 2;
     }
 
     /**
