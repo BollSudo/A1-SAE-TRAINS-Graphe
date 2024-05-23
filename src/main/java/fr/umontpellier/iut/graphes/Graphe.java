@@ -10,6 +10,7 @@ import java.util.*;
  */
 
 public class Graphe {
+    public static Sommet.SommetBuilder sommetBuilder;
     private final Set<Sommet> sommets;
 
     public Graphe(Set<Sommet> sommets) {
@@ -20,7 +21,10 @@ public class Graphe {
      * Construit un graphe à n sommets 0..n-1 sans arêtes
      */
     public Graphe(int n) {
-        throw new RuntimeException("Méthode à implémenter");
+        sommets = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            ajouterSommet(i);
+        }
     }
 
     /**
@@ -97,14 +101,25 @@ public class Graphe {
      * @return l'ensemble d'arêtes du graphe sous forme d'ensemble de paires de sommets
      */
     public Set<Set<Sommet>> getAretes() {
-        throw new RuntimeException("Méthode à implémenter");
+        Set<Set<Sommet>> aretes = new HashSet<>();
+
+        for (Sommet sommet : sommets) {
+            for (Sommet voisin : sommet.getVoisins()) {
+                Set<Sommet> paire = new HashSet<>();
+                paire.add(sommet);
+                paire.add(voisin);
+                aretes.add(paire);
+            }
+        }
+
+        return aretes;
     }
 
     /**
      * @return le nombre d'arêtes du graphe
      */
     public int getNbAretes() {
-        throw new RuntimeException("Méthode à implémenter");
+        return getAretes().size();
     }
 
     /**
@@ -113,7 +128,7 @@ public class Graphe {
      * @param i l'entier correspondant à l'indice du sommet à ajouter dans le graphe
      */
     public boolean ajouterSommet(int i) {
-        throw new RuntimeException("Méthode à implémenter");
+        return sommets.add(sommetBuilder.setIndice(i).createSommet());
     }
 
     /**
