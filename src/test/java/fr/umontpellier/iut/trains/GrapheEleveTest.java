@@ -26,6 +26,24 @@ public class GrapheEleveTest {
         g.ajouterSommet(1);
     }
 
+    public void init5voisinsEntreEux(){
+        g = new Graphe(5);
+        for (int s = 0; s<5; s++){
+            for (int v = 0; v < 5; v++){
+                if (v != s){
+                    g.getSommet(s).ajouterVoisin(g.getSommet(v));
+                }
+            }
+        }
+    }
+
+    public void init5voisinUnPoint(){
+        g = new Graphe(5);
+        for (int v = 1; v<5; v++){
+            g.getSommet(0).ajouterVoisin(g.getSommet(v));
+        }
+    }
+
 
     @Disabled
     @Test
@@ -49,6 +67,12 @@ public class GrapheEleveTest {
         assertEquals(1, g.degre(s2));
         assertEquals(0, g.degre(s3));
         assertEquals(1, g.degre(s4));
+    }
+
+    @Disabled
+    @Test
+    public void test_sequenceEstGraphe(){
+        throw new RuntimeException("Pas encore implémenter");
     }
 
 }
