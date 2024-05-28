@@ -173,7 +173,60 @@ public class Graphe {
      * @return true si et seulement si this est une chaîne. On considère que le graphe vide est une chaîne.
      */
     public boolean estChaine() {
-        throw new RuntimeException("Méthode à implémenter");
+        //CAS PARTICULIERS
+        if (sommets.isEmpty() || sommets.size()==1) {
+            return true;
+        }
+
+        //INIT
+        List<Sommet> sommetsParcourus = new ArrayList<>();
+        boolean estChaine = true;
+        boolean aTrouveSommetDegUn = false;
+
+        Iterator<Sommet> it = sommets.iterator();
+        Sommet currentSommet = null;
+        int currentSommetDeg = 0;
+
+        while (it.hasNext() && estChaine && !aTrouveSommetDegUn) {
+            currentSommet = it.next();
+            currentSommetDeg = degre(currentSommet);
+            if (currentSommetDeg == 0 || currentSommetDeg > 2) {
+                estChaine = false;
+            } else if (currentSommetDeg == 1) {
+                aTrouveSommetDegUn = true;
+            }
+        }
+
+        //BOUCLE
+        if (!aTrouveSommetDegUn) {
+            estChaine = false;
+        } else {
+            boolean finChaine = false;
+            while (estChaine && !finChaine) {
+                if (currentSommetDeg > 2) {
+                    estChaine = false;
+                } else {
+                    int nbVoisinsDejaParcourus = 0;
+                    for (Sommet voisin : currentSommet.getVoisins()) {
+                        if (sommetsParcourus.contains(voisin)) {
+                            nbVoisinsDejaParcourus++;
+                            if (nbVoisinsDejaParcourus == 2) {
+                                estChaine = false;
+                            }
+                        } else {
+                            sommetsParcourus.add(currentSommet);
+                            currentSommet = voisin;
+                            currentSommetDeg = degre(voisin);
+                            if (currentSommetDeg == 1) {
+                                sommetsParcourus.add(voisin);
+                                finChaine = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return estChaine && (sommetsParcourus.size()==getNbSommets());
     }
 
     /**
