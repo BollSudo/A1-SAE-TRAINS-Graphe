@@ -211,4 +211,141 @@ public class GrapheEleveTest {
         assertFalse(Graphe.sequenceEstGraphe(suite5sommetInvalide));
     }
 
+    // @Disabled
+    @Test
+    public void test_degre_max_g_vide() {
+        initVide();
+        assertEquals(0, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_degre_max_g_ordre1() {
+        initSommet(1);
+        assertEquals(0, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_degre_max_g_complet_ordre23() {
+        initSommet(23);
+        relierAllSommets();
+        assertEquals(22, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_degre_max_g_cycle_ordre23() {
+        initCycle(23);
+        assertEquals(2, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_degre_max_g_chaine_ordre23() {
+        initChaine(23);
+        assertEquals(2, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_degre_max_bis() {
+        initSommet(23);
+        Sommet g0 = g.getSommet(0);
+        for (int i=1; i< 10; i++) {
+            g0.ajouterVoisin(g.getSommet(i));
+        }
+        assertEquals(9, g.degreMax());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_faux_1() {
+        initSommet(23);
+
+        assertEquals(23, g.getEnsembleClassesConnexite().size());
+        assertFalse(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_faux_vide() {
+        initVide();
+
+        assertEquals(0, g.getEnsembleClassesConnexite().size());
+        assertFalse(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_true_ordre1() {
+        initSommet(1);
+
+        assertEquals(1, g.getEnsembleClassesConnexite().size());
+        assertTrue(g.estConnexe());
+    }
+    //A CONFIRMER SI FAUX
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_faux_2() {
+        initSommet(23);
+        relierAllSommets();
+        ajouterChaineNonReliee(23);
+
+        assertEquals(2, g.getEnsembleClassesConnexite().size());
+        assertFalse(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_faux_3() {
+        initVide();
+        ajouterChaineNonReliee(23);
+        ajouterChaineNonReliee(12);
+        ajouterChaineNonReliee(3);
+
+        assertEquals(3, g.getEnsembleClassesConnexite().size());
+        assertFalse(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_true_chaine() {
+        initChaine(23);
+
+        assertEquals(1, g.getEnsembleClassesConnexite().size());
+        assertTrue(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_true_cycle() {
+        initCycle(23);
+
+        assertEquals(1, g.getEnsembleClassesConnexite().size());
+        assertTrue(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_true_1() {
+        initSommet(23);
+        relierAllSommets();
+
+        assertEquals(1, g.getEnsembleClassesConnexite().size());
+        assertTrue(g.estConnexe());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_connexe_true_2() {
+        initSommet(23);
+        relierAllSommets();
+        g.getSommet(0).ajouterVoisin(g.getSommet(ajouterChaineNonReliee(3).get(0)));
+
+        assertEquals(1, g.getEnsembleClassesConnexite().size());
+        assertTrue(g.estConnexe());
+    }
+
 }

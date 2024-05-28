@@ -10,7 +10,7 @@ import java.util.*;
  */
 
 public class Graphe {
-    public static Sommet.SommetBuilder sommetBuilder = new Sommet.SommetBuilder();
+    private static final Sommet.SommetBuilder sommetBuilder = new Sommet.SommetBuilder();
     private final Set<Sommet> sommets;
 
     public Graphe(Set<Sommet> sommets) {
@@ -335,14 +335,18 @@ public class Graphe {
      * @return true si et seulement si this est connexe.
      */
     public boolean estConnexe() {
-        throw new RuntimeException("Méthode à implémenter");
+        return getEnsembleClassesConnexite().size()==1;
     }
 
     /**
      * @return le degré maximum des sommets du graphe
      */
     public int degreMax() {
-        throw new RuntimeException("Méthode à implémenter");
+        int degreMax=0;
+        for (Sommet s : sommets) {
+            degreMax = Math.max(degre(s), degreMax);
+        }
+        return degreMax;
     }
 
     /**
