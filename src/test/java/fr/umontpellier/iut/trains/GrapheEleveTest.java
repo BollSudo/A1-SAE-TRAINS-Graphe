@@ -348,4 +348,137 @@ public class GrapheEleveTest {
         assertTrue(g.estConnexe());
     }
 
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete_null() {
+        initVide();
+        assertDoesNotThrow(() -> g.ajouterArete(null, null));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete_meme_sommet() {
+        initSommet(2);
+        g.ajouterArete(g.getSommet(1), g.getSommet(1));
+
+        assertEquals(0, g.getNbAretes());
+        assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
+        assertFalse(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertFalse(g.getSommet(1).estVoisin(g.getSommet(1)));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete_deja_relies() {
+        initSommet(2);
+        relierAllSommets();
+        g.ajouterArete(g.getSommet(0), g.getSommet(1));
+
+        assertEquals(1, g.getNbAretes());
+        assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
+        assertTrue(g.getSommet(0).estVoisin(g.getSommet(1)));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete() {
+        initSommet(2);
+        g.ajouterArete(g.getSommet(0), g.getSommet(1));
+
+        assertEquals(1, g.getNbAretes());
+        assertTrue(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete_bis() {
+        initSommet(2);
+        g.ajouterArete(g.getSommet(1), g.getSommet(0));
+
+        assertEquals(1, g.getNbAretes());
+        assertTrue(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_arete_sommets_deux_graphes_distincts_pas_possile() {
+        initSommet(1);
+        Graphe g2 = new Graphe(1);
+        g.ajouterArete(g.getSommet(0), g2.getSommet(0));
+
+        assertEquals(0, g.getNbAretes());
+        assertEquals(0, g2.getNbAretes());
+        assertFalse(g.getSommet(0).estVoisin(g2.getSommet(0)));
+        assertFalse(g2.getSommet(0).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete_null() {
+        initVide();
+        assertDoesNotThrow(() -> g.supprimerArete(null, null));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete_meme_sommet() {
+        initSommet(2);
+        relierAllSommets();
+        g.supprimerArete(g.getSommet(0), g.getSommet(0));
+
+        assertEquals(1, g.getNbAretes());
+        assertTrue(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete_deja_non_relies() {
+        initSommet(2);
+        g.supprimerArete(g.getSommet(0), g.getSommet(1));
+
+        assertEquals(0, g.getNbAretes());
+        assertFalse(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete() {
+        initSommet(3);
+        relierAllSommets();
+        g.supprimerArete(g.getSommet(0), g.getSommet(1));
+
+        assertEquals(2, g.getNbAretes());
+        assertFalse(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete_bis() {
+        initSommet(3);
+        g.supprimerArete(g.getSommet(1), g.getSommet(0));
+
+        assertEquals(2, g.getNbAretes());
+        assertFalse(g.getSommet(0).estVoisin(g.getSommet(1)));
+        assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
+    }
+
+    @Disabled
+    @Test
+    public void test_supprimer_arete_sommets_deux_graphes_distincts_pas_possile() {
+        initSommet(1);
+        Graphe g2 = new Graphe(1);
+        g.getSommet(0).ajouterVoisin(g2.getSommet(0)); //bidouille
+        g.supprimerArete(g.getSommet(0), g2.getSommet(0));
+
+        assertEquals(1, g.getNbAretes());
+        assertEquals(1, g2.getNbAretes());
+        assertTrue(g.getSommet(0).estVoisin(g2.getSommet(0)));
+        assertTrue(g2.getSommet(0).estVoisin(g.getSommet(0)));
+    }
 }
