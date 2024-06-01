@@ -264,6 +264,10 @@ public class Graphe {
      */
     public boolean possedeUnCycle() {
         throw new RuntimeException("Méthode à implémenter");
+        //acycle => au moins 1 arete et 2 sommets de deg 1
+        // => m <= n - 1
+        //Parcourir les classes de connexités
+        // n'est pas une foret
     }
 
     /**
@@ -395,5 +399,17 @@ public class Graphe {
      */
     public Set<Sommet> getEnsembleCritique(Sommet s, Sommet t){
         throw new RuntimeException("Méthode à implémenter");
+    }
+
+    //METHODES AJOUTEES =======================================================================
+
+    /**
+     * @return true si et seulement si this est un arbre. On considère que le graphe vide est un arbre.
+     */
+    public boolean estArbre() {
+        if (sommets.isEmpty()) {
+            return true;
+        }
+        return estConnexe() && (getNbAretes() == getNbSommets()-1);
     }
 }

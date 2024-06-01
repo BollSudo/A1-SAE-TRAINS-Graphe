@@ -44,11 +44,13 @@ public class GrapheEleveTest {
     }
 
     public void initCycle(int i) {
-        initSommet(i);
-        for (int j = 0; j < i-1; j++) {
-            g.getSommet(j).ajouterVoisin(g.getSommet(j+1));
+        if (i > 2) {
+            initSommet(i);
+            for (int j = 0; j < i-1; j++) {
+                g.getSommet(j).ajouterVoisin(g.getSommet(j+1));
+            }
+            g.getSommet(i-1).ajouterVoisin(g.getSommet(0));
         }
-        g.getSommet(i-1).ajouterVoisin(g.getSommet(0));
     }
 
     public List<Integer> ajouterChaineNonReliee(int i) {
@@ -66,7 +68,34 @@ public class GrapheEleveTest {
         return sIndiceAdd;
     }
 
-//====DEBUT TESTS====================================================================================
+    public List<Integer> ajouterCycleNonReliee(int i) {
+        List<Integer> sIndiceAdd = new ArrayList<>();
+        if (i > 3) {
+            int offset = 777;
+            for (int j = 0; j < i; j++) {
+                while (!g.ajouterSommet(j+offset)) {
+                    offset+=10;
+                }
+                sIndiceAdd.add(j+offset);
+            }
+            for (int j = 0; j < i -1; j++) {
+                g.getSommet(j+offset).ajouterVoisin(g.getSommet(j+offset+1));
+            }
+            g.getSommet(offset).ajouterVoisin(g.getSommet(offset+i-1));
+        }
+        return sIndiceAdd;
+    }
+
+    public void ajouterArbreNonReliee(int longueurTronc, int longueurBranche) {
+        //Tronc de longueur longueurTronc et dont chaque branche et reliee à une chqine de longeurBranche
+        List<Integer> indiceTronc = ajouterChaineNonReliee(longueurTronc);
+        for (Integer indice : indiceTronc) {
+            List<Integer> indiceBranche = ajouterChaineNonReliee(longueurBranche);
+            g.getSommet(indice).ajouterVoisin(g.getSommet(indiceBranche.get(0)));
+        }
+    }
+
+    //====DEBUT TESTS====================================================================================
 
     // @Disabled
     @Test
@@ -583,5 +612,258 @@ public class GrapheEleveTest {
         assertEquals(0, s.getVoisins().size());
         assertTrue(s.getVoisins().isEmpty());
     }
+
+
+    @Disabled
+    @Test
+    public void test_est_cycle_true_ordre_3() {
+        initCycle(3);
+        assertFalse(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_true() {
+        initCycle(13);
+
+        assertTrue(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_false_vide() {
+        initVide();
+        assertFalse(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_false_ordre_1() {
+        initSommet(1);
+        assertFalse(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_false_ordre_2() {
+        initChaine(2);
+        assertFalse(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_false() {
+        initChaine(13);
+
+        assertFalse(g.estCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_cycle_false_bis() {
+        initCycle(13);
+        ajouterCycleNonReliee(12);
+
+        assertFalse(g.estCycle());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_true_vide() {
+        initVide();
+
+        assertTrue(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_true_graine() {
+        initSommet(1);
+
+        assertTrue(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_true_chaine() {
+        initChaine(3);
+
+        assertTrue(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_true_arbre() {
+        initVide();
+        ajouterArbreNonReliee(3, 2);
+
+        assertTrue(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_false_non_connexe() {
+        initChaine(3);
+        ajouterChaineNonReliee(4);
+        ajouterChaineNonReliee(1);
+
+        assertFalse(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_false_non_connexe_bis() {
+        initVide();
+        ajouterArbreNonReliee(3, 4);
+        ajouterChaineNonReliee(1);
+
+        assertFalse(g.estArbre());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_arbre_false_cycle() {
+        initCycle(33);
+
+        assertFalse(g.estArbre());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_true_une_chaine() {
+        initChaine(33);
+
+        assertTrue(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_true_plusieurs_chaines() {
+        initChaine(33);
+        ajouterChaineNonReliee(12);
+        ajouterChaineNonReliee(1);
+
+        assertTrue(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_true_un_arbre() {
+        initVide();
+        ajouterArbreNonReliee(10, 3);
+
+        assertTrue(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_true_plusieurs_arbres() {
+        initVide();
+        ajouterArbreNonReliee(3, 2);
+        ajouterArbreNonReliee(9, 1);
+        ajouterArbreNonReliee(9, 2);
+        ajouterArbreNonReliee(0, 0);
+
+        assertTrue(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_true_vide() {
+        initVide();
+
+        assertTrue(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_false_un_cycle() {
+        initCycle(3);
+
+        assertFalse(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_false_plusieurs_cycle() {
+        initCycle(3);
+        ajouterCycleNonReliee(33);
+        ajouterCycleNonReliee(12);
+
+        assertFalse(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_est_foret_false_plusieurs_cycle_et_arbres() {
+        initChaine(13);
+        ajouterArbreNonReliee(12, 3);
+        ajouterChaineNonReliee(1);
+        ajouterCycleNonReliee(3);
+        ajouterCycleNonReliee(0);
+
+        assertFalse(g.estForet());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_false_graphe_vide() {
+        initVide();
+
+        assertFalse(g.possedeUnCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_true_graphe_connexe() {
+        initCycle(23);
+
+        assertTrue(g.estConnexe());
+        assertTrue(g.possedeUnCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_true_graphe_non_connexe() {
+        initCycle(22);
+        ajouterCycleNonReliee(30);
+        ajouterCycleNonReliee(3);
+        ajouterChaineNonReliee(12);
+
+        assertFalse(g.estConnexe());
+        assertTrue(g.possedeUnCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_false_graphe_connexe() {
+        initSommet(23);
+        relierUnSommetATous(g.getSommet(0));
+
+        assertTrue(g.estConnexe());
+        assertFalse(g.possedeUnCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_false_graphe_non_connexe() {
+        initChaine(33);
+        ajouterChaineNonReliee(3);
+        ajouterChaineNonReliee(1);
+
+        assertFalse(g.estConnexe());
+        assertFalse(g.possedeUnCycle());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnCycle_false_graphe_non_connexe_0_arete() {
+        initSommet(30);
+
+        assertFalse(g.estConnexe());
+        assertFalse(g.possedeUnCycle());
+    }
+
+
 
 }
