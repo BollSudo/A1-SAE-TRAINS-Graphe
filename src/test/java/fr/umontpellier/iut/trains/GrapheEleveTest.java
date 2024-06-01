@@ -481,4 +481,107 @@ public class GrapheEleveTest {
         assertTrue(g.getSommet(0).estVoisin(g2.getSommet(0)));
         assertTrue(g2.getSommet(0).estVoisin(g.getSommet(0)));
     }
+
+    // @Disabled
+    @Test
+    public void test_fusionnerEnsembleSommets_vide() {
+        initSommet(10);
+        Graphe res = Graphe.fusionnerEnsembleSommets(g, new HashSet<>());
+
+        assertNotSame(g, res);
+        assertEquals(10, g.getNbSommets());
+        assertEquals(10, res.getNbSommets());
+        assertTrue(res.getSommets().containsAll(g.getSommets()));
+    }
+
+    // @Disabled
+    @Test
+    public void test_fusionnerEnsembleSommets_non_inclus_dans_g() {
+        initVide();
+        Sommet s = Sommet.sommetBuilder.setIndice(1).createSommet();
+        Graphe res = Graphe.fusionnerEnsembleSommets(g, new HashSet<>(Set.of(s)));
+
+        assertNotSame(g, res);
+        assertEquals(0, g.getNbSommets());
+        assertEquals(1, res.getNbSommets());
+        assertTrue(res.getSommets().contains(s));
+        assertFalse(g.getSommets().contains(s));
+        //VERIFIER LES PRE-REQUIS AVEC LES EXCEPTIONS ?
+    }
+
+    // @Disabled
+    @Test
+    public void test_fusionnerEnsembleSommets() {
+        initSommet(10);
+        relierAllSommets();
+        Set<Sommet> sommets = new HashSet<>(g.getSommets());
+        g.getSommet(0).ajouterVoisin(g.getSommet(ajouterChaineNonReliee(32).get(0)));
+
+        Graphe res = Graphe.fusionnerEnsembleSommets(g, sommets);
+        Sommet s = res.getSommet(0);
+
+        assertNotSame(g, res);
+        assertEquals(10, sommets.size());
+        assertEquals(42, g.getNbSommets());
+        assertEquals(33, res.getNbSommets());
+        assertNotSame(g.getSommet(0), s);
+        assertEquals(0, s.getIndice());
+        assertEquals(0, s.getSurcout());
+        assertEquals(0, s.getNbPointsVictoire());
+        assertEquals(0, s.getJoueurs().size());
+        assertFalse(res.getSommets().containsAll(g.getSommets()));
+    }
+
+    // @Disabled
+    @Test
+    public void test_fusionnerEnsembleSommets_valeurs() {
+        Set<Integer> nullTest = new HashSet<>();
+        nullTest.add(null);
+        Sommet s1 = Sommet.sommetBuilder.setIndice(7).setSurcout(1).setNbPointsVictoire(10).setJoueurs(new HashSet<>(Set.of(1))).createSommet();
+        Sommet s2 = Sommet.sommetBuilder.setIndice(70).setSurcout(10).setNbPointsVictoire(5).setJoueurs(new HashSet<>(Set.of(2))).createSommet();
+        Sommet s3 = Sommet.sommetBuilder.setIndice(19).setSurcout(3).setNbPointsVictoire(13).setJoueurs(new HashSet<>(nullTest)).createSommet();
+        Sommet s4 = Sommet.sommetBuilder.setIndice(1).setSurcout(1).setNbPointsVictoire(1).setJoueurs(new HashSet<>(Set.of(3))).createSommet();
+        initVide();
+        g.ajouterSommet(s1);
+        g.ajouterSommet(s2);
+        g.ajouterSommet(s3);
+        g.ajouterSommet(s4);
+
+        Graphe res = Graphe.fusionnerEnsembleSommets(g, new HashSet<>(Set.of(s1, s2, s3)));
+        Sommet s = res.getSommet(7);
+
+        assertNotSame(g, res);
+        assertEquals(4, g.getNbSommets());
+        assertEquals(2, res.getNbSommets());
+        assertNotSame(g.getSommet(0), s);
+        assertNotEquals(g.getSommet(0), s);
+        assertEquals(7, s.getIndice());
+        assertEquals(14, s.getSurcout());
+        assertEquals(28, s.getNbPointsVictoire());
+        assertEquals(3, s.getJoueurs().size());
+        assertTrue(s.getJoueurs().containsAll(Set.of(1, 2)));
+        assertTrue(s.getJoueurs().contains(null));
+        assertFalse(res.getSommets().containsAll(g.getSommets()));
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_sommet_null() {
+        initVide();
+        g.ajouterSommet(null);
+
+        assertEquals(0, g.getNbSommets());
+        assertTrue(g.getSommets().isEmpty());
+    }
+
+    @Disabled
+    @Test
+    public void test_ajouter_voisin_null() {
+        Sommet s = Sommet.sommetBuilder.setIndice(0).createSommet();
+        s.ajouterVoisin(null);
+
+        assertEquals(0, s.getVoisins().size());
+        assertTrue(s.getVoisins().isEmpty());
+    }
+
 }

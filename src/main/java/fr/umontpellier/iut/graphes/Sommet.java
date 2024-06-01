@@ -33,6 +33,8 @@ public class Sommet {
      */
     private Set<Sommet> voisins;
 
+    public static SommetBuilder sommetBuilder = new SommetBuilder();
+
     /**
      * Constructeur privé pour forcer l'utilisation du builder.
      */

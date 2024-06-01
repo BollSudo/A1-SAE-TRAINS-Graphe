@@ -10,7 +10,6 @@ import java.util.*;
  */
 
 public class Graphe {
-    private static final Sommet.SommetBuilder sommetBuilder = new Sommet.SommetBuilder();
     private final Set<Sommet> sommets;
 
     public Graphe(Set<Sommet> sommets) {
@@ -78,7 +77,23 @@ public class Graphe {
      * L'ensemble de joueurs du nouveau sommet sera l'union des ensembles de joueurs des sommets fusionnés.
      */
     public static Graphe fusionnerEnsembleSommets(Graphe g, Set<Sommet> ensemble) {
-        throw new RuntimeException("Méthode à implémenter");
+        Graphe res = new Graphe(g, g.getSommets());
+        if (!ensemble.isEmpty()) {
+            int indiceMin = Integer.MAX_VALUE;
+            int sommeSurcouts = 0;
+            int sommePtsVictoire = 0;
+            Set<Integer> unionJoueurs = new HashSet<>();
+            for (Sommet s : ensemble) {
+                indiceMin = Integer.min(indiceMin, s.getIndice());
+                sommeSurcouts += s.getSurcout();
+                sommePtsVictoire += s.getNbPointsVictoire();
+                unionJoueurs.addAll(s.getJoueurs());
+            }
+            res.getSommets().removeAll(ensemble);
+            res.ajouterSommet(Sommet.sommetBuilder.setIndice(indiceMin).setSurcout(sommeSurcouts).
+                    setNbPointsVictoire(sommePtsVictoire).setJoueurs(unionJoueurs).createSommet());
+        }
+        return res;
     }
 
     /**
@@ -139,7 +154,7 @@ public class Graphe {
      * @param i l'entier correspondant à l'indice du sommet à ajouter dans le graphe
      */
     public boolean ajouterSommet(int i) {
-        return sommets.add(sommetBuilder.setIndice(i).createSommet());
+        return sommets.add(Sommet.sommetBuilder.setIndice(i).createSommet());
     }
 
     /**
