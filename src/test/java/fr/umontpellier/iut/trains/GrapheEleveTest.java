@@ -433,15 +433,14 @@ public class GrapheEleveTest {
 
     @Disabled
     @Test
-    public void test_ajouter_arete_sommets_deux_graphes_distincts_pas_possile() {
+    public void test_ajouter_arete_sommets_non_inclus_dans_g() {
         initSommet(1);
-        Graphe g2 = new Graphe(1);
-        g.ajouterArete(g.getSommet(0), g2.getSommet(0));
+        Sommet s = new Sommet(Sommet.sommetBuilder.setIndice(10).createSommet());
+        g.ajouterArete(g.getSommet(0), s);
 
         assertEquals(0, g.getNbAretes());
-        assertEquals(0, g2.getNbAretes());
-        assertFalse(g.getSommet(0).estVoisin(g2.getSommet(0)));
-        assertFalse(g2.getSommet(0).estVoisin(g.getSommet(0)));
+        assertFalse(g.getSommet(0).estVoisin(s));
+        assertFalse(s.estVoisin(g.getSommet(0)));
     }
 
     @Disabled
@@ -492,23 +491,22 @@ public class GrapheEleveTest {
         initSommet(3);
         g.supprimerArete(g.getSommet(1), g.getSommet(0));
 
-        assertEquals(2, g.getNbAretes());
+        assertEquals(0, g.getNbAretes());
         assertFalse(g.getSommet(0).estVoisin(g.getSommet(1)));
         assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
     @Disabled
     @Test
-    public void test_supprimer_arete_sommets_deux_graphes_distincts_pas_possile() {
+    public void test_supprimer_arete_sommets_non_inclus_dans_g() {
         initSommet(1);
-        Graphe g2 = new Graphe(1);
-        g.getSommet(0).ajouterVoisin(g2.getSommet(0)); //bidouille
-        g.supprimerArete(g.getSommet(0), g2.getSommet(0));
+        Sommet s = new Sommet(Sommet.sommetBuilder.setIndice(10).createSommet());
+        g.getSommet(0).ajouterVoisin(s); //bidouille
+        g.supprimerArete(g.getSommet(0), s);
 
-        assertEquals(1, g.getNbAretes());
-        assertEquals(1, g2.getNbAretes());
-        assertTrue(g.getSommet(0).estVoisin(g2.getSommet(0)));
-        assertTrue(g2.getSommet(0).estVoisin(g.getSommet(0)));
+        assertEquals(0, g.getNbAretes());
+        assertFalse(g.getSommet(0).estVoisin(s));
+        assertFalse(s.estVoisin(g.getSommet(0)));
     }
 
     // @Disabled
@@ -618,10 +616,10 @@ public class GrapheEleveTest {
     @Test
     public void test_est_cycle_true_ordre_3() {
         initCycle(3);
-        assertFalse(g.estCycle());
+        assertTrue(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_true() {
         initCycle(13);
@@ -629,28 +627,28 @@ public class GrapheEleveTest {
         assertTrue(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_false_vide() {
         initVide();
         assertFalse(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_false_ordre_1() {
         initSommet(1);
         assertFalse(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_false_ordre_2() {
         initChaine(2);
         assertFalse(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_false() {
         initChaine(13);
@@ -658,11 +656,28 @@ public class GrapheEleveTest {
         assertFalse(g.estCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_false_bis() {
         initCycle(13);
         ajouterCycleNonReliee(12);
+
+        assertFalse(g.estCycle());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_cycle_false_bis2() {
+        initSommet(10);
+
+        assertFalse(g.estCycle());
+    }
+
+    // @Disabled
+    @Test
+    public void test_est_cycle_false_bis3() {
+        initChaine(4);
+        g.getSommet(0).ajouterVoisin(g.getSommet(2));
 
         assertFalse(g.estCycle());
     }

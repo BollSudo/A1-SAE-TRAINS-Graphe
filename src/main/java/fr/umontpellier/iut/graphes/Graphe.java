@@ -164,11 +164,10 @@ public class Graphe {
      * @return true si le sommet a été ajouté, false sinon
      */
     public boolean ajouterSommet(Sommet s) {
-        try {
-        return sommets.add(s);
-        } catch (NullPointerException e){
+        if (s==null) {
             return false;
         }
+        return sommets.add(s);
     }
 
     /**
@@ -252,27 +251,42 @@ public class Graphe {
      * @return true si et seulement si this est un cycle. On considère que le graphe vide n'est pas un cycle.
      */
     public boolean estCycle() {
-        boolean value = sommets.size() > 2;
-        Sommet sommetCourant, sommetSuivant, sommetPrecedent;
-        if (value){
-            for (int x = 0; x < sommets.size(); x++){
-                sommetCourant = getSommet(x);
-                if (x == 0) sommetPrecedent = getSommet(sommets.size()-1);
-                else sommetPrecedent = getSommet(x-1);
-                if (x == sommets.size()-1) sommetSuivant = getSommet(0);
-                else sommetSuivant = getSommet(x+1);
-                if (sommetCourant.getVoisins().size() != 2){
-                    value = false;
-                    break;
+        if (getNbSommets() < 3 || getNbAretes() < 3) {
+            return false;
+        } else {
+            Sommet sDepart = sommets.iterator().next();
+            Sommet currentSommet = sDepart;
+            Set<Sommet> sommetsParcourus = new HashSet<>();
+            Set<Sommet> sommetsVoisins;
+            boolean aCycle = false;
+            boolean fini = false;
+            while (!fini) {
+                if (degre(currentSommet) != 2) {
+                    fini = true;
                 } else {
-                    if (!sommetCourant.estVoisin(sommetPrecedent) && !sommetCourant.estVoisin(sommetSuivant)){
-                        value = false;
-                        break;
+                    sommetsVoisins = currentSommet.getVoisins();
+                    Iterator<Sommet> it = sommetsVoisins.iterator();
+                    int compteurVoisinsDejaParcourus = 0;
+                    boolean aVoisinsPasParcourus = false;
+                    while (!aVoisinsPasParcourus && compteurVoisinsDejaParcourus < 2) {
+                        Sommet voisin = it.next();
+                        if (sommetsParcourus.contains(voisin)) {
+                            compteurVoisinsDejaParcourus++;
+                        } else {
+                            sommetsParcourus.add(currentSommet);
+                            currentSommet = voisin;
+                            aVoisinsPasParcourus = true;
+                        }
+                    }
+                    if (compteurVoisinsDejaParcourus == 2) {
+                        sommetsParcourus.add(currentSommet);
+                        aCycle = true;
+                        fini = true;
                     }
                 }
             }
+            return aCycle && (sommetsParcourus.size()==getNbSommets()) && (currentSommet.getVoisins().contains(sDepart));
         }
-        return value;
     }
 
     /**
@@ -299,23 +313,25 @@ public class Graphe {
      */
     public boolean possedeUnIsthme() {
         throw new RuntimeException("Méthode à implémenter");
+        // if chaine (oui) vide (non) ou cycle (non) nbaretes==0 (non)
+        //if not connexe alors false
+        //else parcourir les aretes, les enlever verfier si toujours connexe, les remettre
     }
 
     public void ajouterArete(Sommet s, Sommet t) {
         try {
-            s.ajouterVoisin(t);
-            t.ajouterVoisin(s);
-        } catch (Exception e){
-            return;
-        }
+            if (sommets.contains(s) && sommets.contains(t)) {
+                s.ajouterVoisin(t);
+                t.ajouterVoisin(s);
+            }
+        } catch (NullPointerException ignored) {}
     }
 
     public void supprimerArete(Sommet s, Sommet t) {
         try {
-            s.getVoisins().remove(t);t.getVoisins().remove(s);
-        } catch (Exception e){
-            return;
-        }
+            s.getVoisins().remove(t);
+            t.getVoisins().remove(s);
+        } catch (NullPointerException ignored){}
     }
 
     /**

@@ -97,15 +97,10 @@ public class Sommet {
     }
 
     public void ajouterVoisin(Sommet voisin) {
-        try {
-            if (voisin != this) {
-                voisins.add(voisin);
-                voisin.getVoisins().add(this);
-            }
-        } catch (NullPointerException e){
-            return;
+        if (voisin != this && voisin !=null) {
+            voisins.add(voisin);
+            voisin.getVoisins().add(this);
         }
-
     }
 
     public boolean estVoisin(Sommet sommet) {
