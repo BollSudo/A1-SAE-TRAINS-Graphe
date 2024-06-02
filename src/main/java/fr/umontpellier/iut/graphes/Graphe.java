@@ -164,7 +164,11 @@ public class Graphe {
      * @return true si le sommet a été ajouté, false sinon
      */
     public boolean ajouterSommet(Sommet s) {
+        try {
         return sommets.add(s);
+        } catch (NullPointerException e){
+            return false;
+        }
     }
 
     /**
@@ -248,7 +252,27 @@ public class Graphe {
      * @return true si et seulement si this est un cycle. On considère que le graphe vide n'est pas un cycle.
      */
     public boolean estCycle() {
-        throw new RuntimeException("Méthode à implémenter");
+        boolean value = sommets.size() > 2;
+        Sommet sommetCourant, sommetSuivant, sommetPrecedent;
+        if (value){
+            for (int x = 0; x < sommets.size(); x++){
+                sommetCourant = getSommet(x);
+                if (x == 0) sommetPrecedent = getSommet(sommets.size()-1);
+                else sommetPrecedent = getSommet(x-1);
+                if (x == sommets.size()-1) sommetSuivant = getSommet(0);
+                else sommetSuivant = getSommet(x+1);
+                if (sommetCourant.getVoisins().size() != 2){
+                    value = false;
+                    break;
+                } else {
+                    if (!sommetCourant.estVoisin(sommetPrecedent) && !sommetCourant.estVoisin(sommetSuivant)){
+                        value = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return value;
     }
 
     /**
