@@ -302,11 +302,20 @@ public class Graphe {
     }
 
     public void ajouterArete(Sommet s, Sommet t) {
-        throw new RuntimeException("Méthode à implémenter");
+        try {
+            s.ajouterVoisin(t);
+            t.ajouterVoisin(s);
+        } catch (Exception e){
+            return;
+        }
     }
 
     public void supprimerArete(Sommet s, Sommet t) {
-        throw new RuntimeException("Méthode à implémenter");
+        try {
+            s.getVoisins().remove(t);t.getVoisins().remove(s);
+        } catch (Exception e){
+            return;
+        }
     }
 
     /**
