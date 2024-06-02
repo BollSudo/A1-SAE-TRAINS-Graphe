@@ -70,7 +70,7 @@ public class GrapheEleveTest {
 
     public List<Integer> ajouterCycleNonReliee(int i) {
         List<Integer> sIndiceAdd = new ArrayList<>();
-        if (i > 3) {
+        if (i > 2) {
             int offset = 777;
             for (int j = 0; j < i; j++) {
                 while (!g.ajouterSommet(j+offset)) {
@@ -220,7 +220,7 @@ public class GrapheEleveTest {
         assertFalse(g.estChaine());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_sequenceEstGraphe(){
         List<Integer> suiteVide = new ArrayList<>();
@@ -378,14 +378,14 @@ public class GrapheEleveTest {
     }
 
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete_null() {
         initVide();
         assertDoesNotThrow(() -> g.ajouterArete(null, null));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete_meme_sommet() {
         initSommet(2);
@@ -397,7 +397,7 @@ public class GrapheEleveTest {
         assertFalse(g.getSommet(1).estVoisin(g.getSommet(1)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete_deja_relies() {
         initSommet(2);
@@ -409,7 +409,7 @@ public class GrapheEleveTest {
         assertTrue(g.getSommet(0).estVoisin(g.getSommet(1)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete() {
         initSommet(2);
@@ -420,7 +420,7 @@ public class GrapheEleveTest {
         assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete_bis() {
         initSommet(2);
@@ -431,7 +431,7 @@ public class GrapheEleveTest {
         assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_arete_sommets_non_inclus_dans_g() {
         initSommet(1);
@@ -443,14 +443,14 @@ public class GrapheEleveTest {
         assertFalse(s.estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete_null() {
         initVide();
         assertDoesNotThrow(() -> g.supprimerArete(null, null));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete_meme_sommet() {
         initSommet(2);
@@ -462,7 +462,7 @@ public class GrapheEleveTest {
         assertTrue(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete_deja_non_relies() {
         initSommet(2);
@@ -473,7 +473,7 @@ public class GrapheEleveTest {
         assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete() {
         initSommet(3);
@@ -485,7 +485,7 @@ public class GrapheEleveTest {
         assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete_bis() {
         initSommet(3);
@@ -496,7 +496,7 @@ public class GrapheEleveTest {
         assertFalse(g.getSommet(1).estVoisin(g.getSommet(0)));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_supprimer_arete_sommets_non_inclus_dans_g() {
         initSommet(1);
@@ -591,7 +591,7 @@ public class GrapheEleveTest {
         assertFalse(res.getSommets().containsAll(g.getSommets()));
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_sommet_null() {
         initVide();
@@ -601,7 +601,7 @@ public class GrapheEleveTest {
         assertTrue(g.getSommets().isEmpty());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_ajouter_voisin_null() {
         Sommet s = Sommet.sommetBuilder.setIndice(0).createSommet();
@@ -612,7 +612,7 @@ public class GrapheEleveTest {
     }
 
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_cycle_true_ordre_3() {
         initCycle(3);
@@ -743,7 +743,7 @@ public class GrapheEleveTest {
         assertFalse(g.estArbre());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_true_une_chaine() {
         initChaine(33);
@@ -751,7 +751,7 @@ public class GrapheEleveTest {
         assertTrue(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_true_plusieurs_chaines() {
         initChaine(33);
@@ -761,7 +761,7 @@ public class GrapheEleveTest {
         assertTrue(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_true_un_arbre() {
         initVide();
@@ -770,7 +770,7 @@ public class GrapheEleveTest {
         assertTrue(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_true_plusieurs_arbres() {
         initVide();
@@ -782,7 +782,7 @@ public class GrapheEleveTest {
         assertTrue(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_true_vide() {
         initVide();
@@ -790,7 +790,7 @@ public class GrapheEleveTest {
         assertTrue(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_false_un_cycle() {
         initCycle(3);
@@ -798,7 +798,7 @@ public class GrapheEleveTest {
         assertFalse(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_false_plusieurs_cycle() {
         initCycle(3);
@@ -808,7 +808,7 @@ public class GrapheEleveTest {
         assertFalse(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_est_foret_false_plusieurs_cycle_et_arbres() {
         initChaine(13);
@@ -820,7 +820,7 @@ public class GrapheEleveTest {
         assertFalse(g.estForet());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_false_graphe_vide() {
         initVide();
@@ -828,7 +828,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_true_graphe_connexe() {
         initCycle(23);
@@ -837,7 +837,7 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_true_graphe_non_connexe() {
         initCycle(22);
@@ -845,11 +845,13 @@ public class GrapheEleveTest {
         ajouterCycleNonReliee(3);
         ajouterChaineNonReliee(12);
 
+        assertEquals(67, g.getNbSommets());
+        assertEquals(66, g.getNbAretes());
         assertFalse(g.estConnexe());
         assertTrue(g.possedeUnCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_false_graphe_connexe() {
         initSommet(23);
@@ -859,7 +861,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_false_graphe_non_connexe() {
         initChaine(33);
@@ -870,7 +872,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnCycle());
     }
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnCycle_false_graphe_non_connexe_0_arete() {
         initSommet(30);

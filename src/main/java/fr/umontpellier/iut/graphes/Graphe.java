@@ -294,18 +294,24 @@ public class Graphe {
      * et que le graphe vide est un arbre.
      */
     public boolean estForet() {
-        throw new RuntimeException("Méthode à implémenter");
+        Set<Set<Sommet>> classes = getEnsembleClassesConnexite();
+        Graphe composanteConnexe;
+        for (Set<Sommet> sommets : classes) {
+            composanteConnexe = new Graphe(this, sommets);
+            if (!composanteConnexe.estArbre()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
      * @return true si et seulement si this a au moins un cycle. On considère que le graphe vide n'est pas un cycle.
      */
     public boolean possedeUnCycle() {
-        throw new RuntimeException("Méthode à implémenter");
-        //acycle => au moins 1 arete et 2 sommets de deg 1
-        // => m <= n - 1
-        //Parcourir les classes de connexités
-        // n'est pas une foret
+        return !estForet();
+        // arbre <=> sans cycle et connexe
+        // pas arbre <=> cycle ou pas connexe (or classe de connexite forcemment connexe)
     }
 
     /**
