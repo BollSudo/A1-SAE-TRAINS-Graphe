@@ -2,7 +2,10 @@ package fr.umontpellier.iut.trains;
 
 import fr.umontpellier.iut.graphes.Graphe;
 import fr.umontpellier.iut.graphes.Sommet;
+import fr.umontpellier.iut.trains.plateau.Plateau;
+import fr.umontpellier.iut.trains.plateau.Tuile;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 
 import java.util.*;
@@ -988,5 +991,147 @@ public class GrapheEleveTest {
         assertEquals(5, g.getSommetsDegresDecroissantDegreSuperieurAOrdre(3).size());
         assertIterableEquals(expected, g.getSequenceDegres());
         assertIterableEquals(expected2, g.getSequenceDegres(3));
+    }
+
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_vide() {
+        initVide();
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_ordre_1() {
+        initSommet(1);
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_cycle() {
+        initCycle(10);
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_complet() {
+        initSommet(10);
+        relierAllSommets();
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_non_connexe() {
+        initSommet(10);
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_false_non_connexe_bis() {
+        initChaine(10);
+        ajouterCycleNonReliee(10);
+        ajouterArbreNonReliee(10, 2);
+        ajouterChaineNonReliee(10);
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_true_chaine() {
+        initChaine(10);
+
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_true_arbre() {
+        initVide();
+        ajouterArbreNonReliee(10, 3);
+
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_true_1() {
+        initCycle(3);
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(10).createSommet());
+        g.ajouterArete(g.getSommet(10), g.getSommet(0));
+
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_true_2() {
+        initSommet(10);
+        relierUnSommetATous(g.getSommet(0));
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeUnIsthme_true_3() {
+        initCycle(3);
+        Integer indice = ajouterCycleNonReliee(10).get(0);
+        g.getSommet(indice).ajouterVoisin(g.getSommet(0));
+
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    // @Disabled
+    @Test
+    public void test_graphe_osaka_bis() {
+        Jeu jeu = new Jeu(new String[]{"Lois", "Clark"}, new String[]{}, Plateau.OSAKA);
+        Joueur j1 = jeu.getJoueurs().get(1);
+        Joueur j2 = jeu.getJoueurs().get(0);
+
+        for (Tuile tuile : jeu.getTuiles()) {
+            tuile.ajouterRail(j1);
+        }
+        jeu.getTuile(3).ajouterRail(j2);
+        jeu.getTuile(4).ajouterRail(j2);
+        jeu.getTuile(8).ajouterRail(j2);
+
+        Graphe g1 = jeu.getGraphe(j1);
+        Graphe g2 = jeu.getGraphe(j2);
+        initCycle(3);
+
+        assertTrue(jeu.getTuile(3).hasRail(j2));
+        assertTrue(jeu.getTuile(3).hasRail(j1));
+        assertEquals(66, g1.getNbSommets());
+        assertEquals(3, g2.getNbSommets());
+        assertEquals(151, g1.getNbAretes());
+        assertEquals(1, g2.getNbAretes());
+        assertTrue(g1.estConnexe());
+        assertFalse(g2.estConnexe());
+        assertFalse(g1.estChaine());
+        assertFalse(g2.estChaine());
+        assertFalse(g1.estArbre());
+        assertFalse(g2.estArbre());
+//        assertFalse(g1.possedeUnIsthme());
+//        assertFalse(g2.possedeUnIsthme());
+        assertTrue(g1.possedeUnCycle());
+        assertFalse(g2.possedeUnCycle());
+        assertTrue(g1.possedeSousGrapheComplet(3));
+        assertFalse(g2.possedeSousGrapheComplet(3));
+//        assertTrue(g1.possedeSousGrapheIsomorphe(g2));
+//        assertFalse(g2.possedeSousGrapheIsomorphe(g1));
+//        assertTrue(g1.possedeSousGrapheIsomorphe(g));
+//        assertFalse(g2.possedeSousGrapheIsomorphe(g));
+        assertEquals(6, g1.degreMax());
+        assertEquals(1, g2.degreMax());
     }
 }
