@@ -12,6 +12,8 @@ import java.util.*;
 public class Graphe {
     private final Set<Sommet> sommets;
 
+    private boolean check = false;
+
     public Graphe(Set<Sommet> sommets) {
         this.sommets = sommets;
     }
@@ -131,10 +133,12 @@ public class Graphe {
 
         for (Sommet sommet : sommets) {
             for (Sommet voisin : sommet.getVoisins()) {
-                Set<Sommet> paire = new HashSet<>();
-                paire.add(sommet);
-                paire.add(voisin);
-                aretes.add(paire);
+                if (sommets.contains(voisin)) {
+                    Set<Sommet> paire = new HashSet<>();
+                    paire.add(sommet);
+                    paire.add(voisin);
+                    aretes.add(paire);
+                }
             }
         }
 
@@ -436,7 +440,51 @@ public class Graphe {
      * @return true si et seulement si this possède un sous-graphe complet d'ordre {@code k}
      */
     public boolean possedeSousGrapheComplet(int k) {
-        throw new RuntimeException("Méthode à implémenter");
+        //Regarder les classes de connexités
+        //Pour chaque composante connexe :
+            //Trier les sommets en fonction de leur degré
+            //prendre les sommets de degré supérieur à k-1
+            //verifier pour chaque combinaison de sous graphe d'ordre 3 contenant ces sommets, si estComplet
+                //Si oui, alors true, Sinon continuer jusqu'à plus de combinaisons
+                //Passer à la composante connexe suivante
+
+        check = false; //PRE INIT, variable globale pour stopper la recursivité
+        //CAS EXTREME
+        if (k > getNbSommets() || k < 0) {
+            return false;
+        } else if (k <= 1) {
+            return true;
+        } else if (estComplet()) {
+            return true;
+        } else if (k > 2 && !possedeUnCycle()) {
+            return false;
+        }
+        //INIT
+        Set<Set<Sommet>> classesConnexite = getEnsembleClassesConnexite();
+        Graphe g; //pour stocker les composantes connexes
+        LinkedList<Sommet> sommetsGraphe;
+        LinkedList<Sommet> sommetsSousGraphe;
+
+        //PARCOURIR LES COMPOSANTES CONNEXES
+        for (Set<Sommet> classe : classesConnexite) {
+            g = new Graphe(classe); //composante connexe de this
+            if (g.estComplet() && g.getNbSommets() >= k) {
+                return true;
+            }
+            else if (!((g.estChaine() && k>2) || (g.estCycle() && k>3) || (!g.possedeUnCycle()) && k>2)) {
+                //Conditions pour rendre l'algo plus rapide, car sinon le temps augmente avec l'arborescence du graphe, or si
+                //le graphe est un arbre alors, il n'a pas de cycle, or un graphe complet d'ordre supérieur a 2
+                //a forcemment un cycle.
+                //INIT
+                sommetsGraphe = new LinkedList<>(g.getSommetsDegresDecroissantDegreSuperieurAOrdre(k));
+                sommetsSousGraphe = new LinkedList<>();
+                //BOUCLE
+                if (sousGrapheEstClique(sommetsGraphe, sommetsSousGraphe, 0, k, g)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -467,4 +515,81 @@ public class Graphe {
         }
         return estConnexe() && (getNbAretes() == getNbSommets()-1);
     }
+
+    /**
+     * Fonction recursive por calculer les combinaisons de graphe d'ordre k, avec des sommets contenus
+     * dans ensembleInit. Pour chaque combinaison, vérifie si la combinaison ensembleCourrant forme un graphe complet.
+     * S'arrete lorsqu'il en trouve un.
+     */
+    private boolean sousGrapheEstClique(LinkedList<Sommet> ensembleInit, LinkedList<Sommet> ensembleCourrant,
+                                        int indiceCourrant, int k, Graphe sousGraphe) {
+
+        if (ensembleCourrant.size() == k) {
+            sousGraphe = new Graphe(new HashSet<>(ensembleCourrant));
+            if (sousGraphe.estComplet()) {
+                check = true;
+            }
+            return check;
+        }
+        for (int i = indiceCourrant; i <= ensembleInit.size() - k + ensembleCourrant.size(); i++) {
+            ensembleCourrant.add(ensembleInit.get(i));
+            if (!check) {
+                sousGrapheEstClique(ensembleInit, ensembleCourrant, i+1, k, sousGraphe);
+            }
+            ensembleCourrant.remove(ensembleCourrant.size() -1);
+        }
+        return check;
+    }
+
+    /**
+     * Trie les sommets de this en fonction de leur degré (décroissant) et renvoie une nouvelle Queue les contenant.
+     */
+    public PriorityQueue<Sommet> getSommetsDegresDecroissant() {
+        PriorityQueue<Sommet> sommetsDec = new PriorityQueue<>(
+                (Sommet s1, Sommet s2) -> Integer.compare(degre(s2), degre(s1))
+        );
+        sommetsDec.addAll(sommets);
+        return sommetsDec;
+    }
+
+    /**
+     * Renvoie la sequence de degré de this
+     */
+    public List<Integer> getSequenceDegres() {
+        List<Integer> sequence = new ArrayList<>();
+        PriorityQueue<Sommet> sommetDesc = getSommetsDegresDecroissant();
+        while (!sommetDesc.isEmpty()) {
+            sequence.add(degre(sommetDesc.remove()));
+        }
+        return sequence;
+    }
+
+    /**
+     * Trie les sommets de this en fonction de leur degré (décroissant) et renvoie une nouvelle List contenant,
+     * seulement les sommets de degré supérieur à ordre-1
+     */
+    public LinkedList<Sommet> getSommetsDegresDecroissantDegreSuperieurAOrdre(int ordre) {
+        PriorityQueue<Sommet> sommetsDesc = getSommetsDegresDecroissant();
+        LinkedList<Sommet> res = new LinkedList<>();
+        Sommet currSommet;
+        while (!sommetsDesc.isEmpty() && degre(currSommet = sommetsDesc.remove()) >= ordre-1) {
+            res.add(currSommet);
+        }
+        return res;
+    }
+
+    /**
+     * Renvoie la sequence de degré de this pour seulement les sommets de degré supérieur à ordre-1
+     */
+    public List<Integer> getSequenceDegres(int ordre) {
+        List<Integer> sequence = new ArrayList<>();
+        LinkedList<Sommet> sommetsDesc = getSommetsDegresDecroissantDegreSuperieurAOrdre(ordre);
+        while (!sommetsDesc.isEmpty()) {
+            sequence.add(degre(sommetsDesc.remove()));
+        }
+        return sequence;
+    }
+
+
+
 }

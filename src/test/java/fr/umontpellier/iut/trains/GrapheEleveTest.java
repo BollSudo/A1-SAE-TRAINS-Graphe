@@ -3,7 +3,6 @@ package fr.umontpellier.iut.trains;
 import fr.umontpellier.iut.graphes.Graphe;
 import fr.umontpellier.iut.graphes.Sommet;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 
 import java.util.*;
@@ -881,6 +880,113 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnCycle());
     }
 
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_true_cas_extreme() {
+        initChaine(10);
 
+        assertTrue(g.possedeSousGrapheComplet(0));
+        assertTrue(g.possedeSousGrapheComplet(1));
+    }
 
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_false_k_pas_valide() {
+        initChaine(10);
+
+        assertFalse(g.possedeSousGrapheComplet(12));
+        assertFalse(g.possedeSousGrapheComplet(-1));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_chaine() {
+        initChaine(33);
+
+        assertFalse(g.possedeSousGrapheComplet(13));
+        assertFalse(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_cycle() {
+        initCycle(33);
+
+        assertFalse(g.possedeSousGrapheComplet(13));
+        assertFalse(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_1() {
+        initCycle(3);
+
+        assertFalse(g.possedeSousGrapheComplet(13));
+        assertTrue(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_2() {
+        initSommet(20);
+        relierAllSommets();
+        ajouterCycleNonReliee(30);
+
+        assertTrue(g.possedeSousGrapheComplet(20));
+        assertTrue(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_3() {
+        initSommet(10);
+        relierUnSommetATous(g.getSommet(0));
+        ajouterChaineNonReliee(10);
+        ajouterCycleNonReliee(3);
+        ajouterArbreNonReliee(20, 20);
+
+        assertFalse(g.possedeSousGrapheComplet(10));
+        assertFalse(g.possedeSousGrapheComplet(5));
+        assertTrue(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_possedeSousGrapheComplet_4() {
+        initSommet(10);
+        relierUnSommetATous(g.getSommet(0));
+        g.getSommet(2).ajouterVoisin(g.getSommet(7));
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
+        ajouterChaineNonReliee(10);
+        ajouterCycleNonReliee(3);
+        ajouterArbreNonReliee(20, 5);
+
+        assertFalse(g.possedeSousGrapheComplet(5));
+        assertTrue(g.possedeSousGrapheComplet(3));
+        assertTrue(g.possedeSousGrapheComplet(2));
+    }
+
+    // @Disabled
+    @Test
+    public void test_getSommetsDegresDecroissant() {
+        initSommet(4);
+        relierUnSommetATous(g.getSommet(0));
+        ajouterChaineNonReliee(3);
+        ajouterCycleNonReliee(3);
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
+
+        // (3,2,2,2,2,1,1,1,1,1,0)
+        List<Integer> expected = new ArrayList<>(List.of(3,2,2,2,2,1,1,1,1,1,0));
+        List<Integer> expected2 = new ArrayList<>(List.of(3,2,2,2,2));
+
+        assertEquals(11, g.getSommetsDegresDecroissant().size());
+        assertEquals(5, g.getSommetsDegresDecroissantDegreSuperieurAOrdre(3).size());
+        assertIterableEquals(expected, g.getSequenceDegres());
+        assertIterableEquals(expected2, g.getSequenceDegres(3));
+    }
 }
