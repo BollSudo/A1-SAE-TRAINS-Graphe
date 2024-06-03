@@ -322,10 +322,29 @@ public class Graphe {
      * @return true si et seulement si this a un isthme
      */
     public boolean possedeUnIsthme() {
-        throw new RuntimeException("Méthode à implémenter");
-        // if chaine (oui) vide (non) ou cycle (non) nbaretes==0 (non)
-        //if not connexe alors false
-        //else parcourir les aretes, les enlever verfier si toujours connexe, les remettre
+        boolean value = false;
+        if (!estCycle() && getNbAretes()>0 && estConnexe()){
+            if (estChaine()){
+                value = true;
+            } else {
+                Sommet v;
+                for (Sommet s : sommets){
+
+                    for (int x = 0; x< s.getVoisins().size(); x++){
+                        v = s.getVoisins().stream().toList().get(x);
+                        supprimerArete(s, v);
+                        if (!estConnexe()){
+                            value = true;
+                            ajouterArete(s, v);
+                            break;
+                        } else {
+                            ajouterArete(s, v);
+                        }
+                    }
+                }
+            }
+        }
+        return value;
     }
 
     public void ajouterArete(Sommet s, Sommet t) {

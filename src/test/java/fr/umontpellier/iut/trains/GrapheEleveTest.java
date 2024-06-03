@@ -994,7 +994,7 @@ public class GrapheEleveTest {
     }
 
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_vide() {
         initVide();
@@ -1002,7 +1002,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_ordre_1() {
         initSommet(1);
@@ -1010,7 +1010,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_cycle() {
         initCycle(10);
@@ -1018,7 +1018,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_complet() {
         initSommet(10);
@@ -1027,7 +1027,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_non_connexe() {
         initSommet(10);
@@ -1035,7 +1035,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_false_non_connexe_bis() {
         initChaine(10);
@@ -1046,7 +1046,7 @@ public class GrapheEleveTest {
         assertFalse(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_true_chaine() {
         initChaine(10);
@@ -1054,7 +1054,7 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_true_arbre() {
         initVide();
@@ -1063,7 +1063,7 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_true_1() {
         initCycle(3);
@@ -1073,7 +1073,7 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_true_2() {
         initSommet(10);
@@ -1081,7 +1081,7 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnIsthme());
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void test_possedeUnIsthme_true_3() {
         initCycle(3);
@@ -1133,5 +1133,28 @@ public class GrapheEleveTest {
 //        assertFalse(g2.possedeSousGrapheIsomorphe(g));
         assertEquals(6, g1.degreMax());
         assertEquals(1, g2.degreMax());
+    }// @Disabled
+    @Test
+    public void test_possedeUnIsthme_etoile(){
+        initSommet(5);
+        relierUnSommetATous(g.getSommet(0));
+        assertTrue(g.possedeUnIsthme());
     }
+    // @Disabled
+    @Test
+    public void test_possedeUnIsthme_altere(){
+        initSommet(6);
+        g.ajouterArete(g.getSommet(0),g.getSommet(1));
+        g.ajouterArete(g.getSommet(1),g.getSommet(2));
+        g.ajouterArete(g.getSommet(2),g.getSommet(0));
+
+        g.ajouterArete(g.getSommet(2),g.getSommet(3));
+
+        g.ajouterArete(g.getSommet(3),g.getSommet(4));
+        g.ajouterArete(g.getSommet(4),g.getSommet(5));
+        g.ajouterArete(g.getSommet(5),g.getSommet(3));
+
+        assertTrue(g.possedeUnIsthme());
+    }
+
 }
