@@ -551,11 +551,13 @@ public class GrapheEleveTest {
         initSommet(10);
         relierAllSommets();
         Set<Sommet> sommets = new HashSet<>(g.getSommets());
-        ajouterAretePratique(0, ajouterChaineNonReliee(32).get(0));
+        int indice;
+        ajouterAretePratique(0, indice = ajouterChaineNonReliee(32).get(0));
 
         Graphe res = Graphe.fusionnerEnsembleSommets(g, sommets);
         Sommet s = res.getSommet(0);
 
+        assertEquals(Set.of(res.getSommet(indice)), s.getVoisins());
         assertNotSame(g, res);
         assertEquals(10, sommets.size());
         assertEquals(42, g.getNbSommets());

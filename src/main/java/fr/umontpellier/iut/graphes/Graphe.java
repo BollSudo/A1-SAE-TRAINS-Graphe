@@ -86,6 +86,7 @@ public class Graphe {
      */
     public static Graphe fusionnerEnsembleSommets(Graphe g, Set<Sommet> ensemble) {
         Graphe res = new Graphe(g, g.getSommets());
+        Set<Sommet> voisinsFusion = new HashSet<>();
         if (!ensemble.isEmpty()) {
             int indiceMin = Integer.MAX_VALUE;
             int sommeSurcouts = 0;
@@ -96,10 +97,14 @@ public class Graphe {
                 sommeSurcouts += s.getSurcout();
                 sommePtsVictoire += s.getNbPointsVictoire();
                 unionJoueurs.addAll(s.getJoueurs());
+                voisinsFusion.addAll(s.getVoisins());
             }
             res.getSommets().removeAll(ensemble);
-            res.ajouterSommet(Sommet.sommetBuilder.setIndice(indiceMin).setSurcout(sommeSurcouts).
-                    setNbPointsVictoire(sommePtsVictoire).setJoueurs(unionJoueurs).createSommet());
+            voisinsFusion.removeAll(ensemble);
+            Sommet Sfusion = Sommet.sommetBuilder.setIndice(indiceMin).setSurcout(sommeSurcouts).
+                    setNbPointsVictoire(sommePtsVictoire).setJoueurs(unionJoueurs).createSommet();
+            Sfusion.getVoisins().addAll(voisinsFusion);
+            res.ajouterSommet(Sfusion);
         }
         return res;
     }
