@@ -45,8 +45,15 @@ public class Graphe {
      */
     public Graphe(Graphe g, Set<Sommet> X) {
         sommets = new HashSet<>();
+        Sommet newS;
         for (Sommet s : X){
-            ajouterSommet(g.getSommet(s.getIndice()));
+            newS = new Sommet(g.getSommet(s.getIndice()));
+            for (Sommet voisin : s.getVoisins()) {
+                if (!X.contains(voisin)) {
+                    newS.getVoisins().remove(voisin);
+                }
+            }
+            ajouterSommet(newS);
         }
     }
 
@@ -322,29 +329,33 @@ public class Graphe {
      * @return true si et seulement si this a un isthme
      */
     public boolean possedeUnIsthme() {
-        boolean value = false;
-        if (!estCycle() && getNbAretes()>0 && estConnexe()){
-            if (estChaine()){
-                value = true;
-            } else {
-                Sommet v;
-                for (Sommet s : sommets){
+        // if chaine (oui) vide (non) ou cycle (non) nbaretes==0 (non)
+        //else pour chq composqnte connexe: parcourir les aretes, les enlever verfier si toujours connexe, les remettre
+        //si connexe et possede sommets de deg 1, forcemment un isthme
+        Graphe composanteConnexe;
+        for (Set<Sommet> classe : getEnsembleClassesConnexite()) {
+            composanteConnexe = new Graphe(this, classe);
 
-                    for (int x = 0; x< s.getVoisins().size(); x++){
-                        v = s.getVoisins().stream().toList().get(x);
-                        supprimerArete(s, v);
-                        if (!estConnexe()){
-                            value = true;
-                            ajouterArete(s, v);
-                            break;
-                        } else {
-                            ajouterArete(s, v);
+            if (!composanteConnexe.estCycle() && composanteConnexe.getNbSommets()>1){
+                if (composanteConnexe.estChaine()){
+                    return true;
+                } else {
+                    Sommet v;
+                    for (Sommet s : composanteConnexe.getSommets()){
+                        for (int x = 0; x< s.getVoisins().size(); x++){
+                            v = s.getVoisins().stream().toList().get(x);
+                            composanteConnexe.supprimerArete(s, v);
+                            if (!composanteConnexe.estConnexe()){
+                                composanteConnexe.ajouterArete(s, v);
+                                return true;
+                            }
+                            composanteConnexe.ajouterArete(s, v);
                         }
                     }
                 }
             }
         }
-        return value;
+        return false;
     }
 
     public void ajouterArete(Sommet s, Sommet t) {
@@ -369,7 +380,36 @@ public class Graphe {
      * (si deux sommets ont le même degré, alors on les ordonne par indice croissant).
      */
     public Map<Integer, Set<Sommet>> getColorationGloutonne() {
-        throw new RuntimeException("Méthode à implémenter");
+        //INIT
+        Map<Integer, Set<Sommet>> coloration = new HashMap<>();
+        PriorityQueue<Sommet> sommetDesc = getSommetsDegresDecroissant();
+        Set<Sommet> voisins;
+        Iterator<Sommet> it;
+        Set<Sommet> current;
+        Sommet s;
+        //BOUCLE
+        while (!sommetDesc.isEmpty()){
+            int i = 1;
+            boolean aTrouveCouleur = false;
+            s = sommetDesc.poll();
+            voisins = s.getVoisins();
+            it = voisins.iterator();
+            current = coloration.get(i);
+            while (!aTrouveCouleur && it.hasNext()) {
+                if (current==null || !current.contains(it.next())) {
+                     aTrouveCouleur = true;
+                } else {
+                    i++;
+                    current = coloration.get(i);
+                }
+            }
+            if (current == null) {
+                coloration.put(i, new HashSet<>(Set.of(s)));
+            } else {
+                current.add(s);
+            }
+        }
+        return coloration;
     }
 
     /**
@@ -387,6 +427,7 @@ public class Graphe {
      */
     public int getDistance(Sommet depart, Sommet arrivee) {
         throw new RuntimeException("Méthode à implémenter");
+        //DJIKSTRA
     }
 
     /**
@@ -486,16 +527,16 @@ public class Graphe {
 
         //PARCOURIR LES COMPOSANTES CONNEXES
         for (Set<Sommet> classe : classesConnexite) {
-            g = new Graphe(classe); //composante connexe de this
+            g = new Graphe(this, classe); //composante connexe de this
             if (g.estComplet() && g.getNbSommets() >= k) {
                 return true;
             }
-            else if (!((g.estChaine() && k>2) || (g.estCycle() && k>3) || (!g.possedeUnCycle()) && k>2)) {
+            else if (!((g.estChaine() && k>2) || (g.estCycle() && k>3) || (g.estArbre()) && k>2)) {
                 //Conditions pour rendre l'algo plus rapide, car sinon le temps augmente avec l'arborescence du graphe, or si
-                //le graphe est un arbre alors, il n'a pas de cycle, or un graphe complet d'ordre supérieur a 2
-                //a forcemment un cycle.
+                //le graphe est un arbre alors, il n'a pas de cycle et connexe (composant connexe toujours connexe),
+                //or un graphe complet d'ordre supérieur à 2 a forcément un cycle.
                 //INIT
-                sommetsGraphe = new LinkedList<>(g.getSommetsDegresDecroissantDegreSuperieurAOrdre(k));
+                sommetsGraphe = g.getSommetsDegresDecroissantDegreSuperieurAOrdre(k);
                 sommetsSousGraphe = new LinkedList<>();
                 //BOUCLE
                 if (sousGrapheEstClique(sommetsGraphe, sommetsSousGraphe, 0, k, g)) {
@@ -540,11 +581,11 @@ public class Graphe {
      * dans ensembleInit. Pour chaque combinaison, vérifie si la combinaison ensembleCourrant forme un graphe complet.
      * S'arrete lorsqu'il en trouve un.
      */
-    private boolean sousGrapheEstClique(LinkedList<Sommet> ensembleInit, LinkedList<Sommet> ensembleCourrant,
+    private boolean sousGrapheEstClique(List<Sommet> ensembleInit, List<Sommet> ensembleCourrant,
                                         int indiceCourrant, int k, Graphe sousGraphe) {
 
         if (ensembleCourrant.size() == k) {
-            sousGraphe = new Graphe(new HashSet<>(ensembleCourrant));
+            sousGraphe = new Graphe(this, new HashSet<>(ensembleCourrant));
             if (sousGraphe.estComplet()) {
                 check = true;
             }
@@ -565,10 +606,27 @@ public class Graphe {
      */
     public PriorityQueue<Sommet> getSommetsDegresDecroissant() {
         PriorityQueue<Sommet> sommetsDec = new PriorityQueue<>(
-                (Sommet s1, Sommet s2) -> Integer.compare(degre(s2), degre(s1))
+                (Sommet s1, Sommet s2) ->
+                        degre(s2)==degre(s1) ?
+                                Integer.compare(s1.getIndice(), s2.getIndice()) :
+                                Integer.compare(degre(s2), degre(s1))
         );
         sommetsDec.addAll(sommets);
         return sommetsDec;
+    }
+
+    /**
+     * Trie les sommets de this en fonction de leur degré (décroissant) et renvoie une nouvelle Queue les contenant.
+     */
+    public PriorityQueue<Sommet> getSommetsDegresCroissant() {
+        PriorityQueue<Sommet> sommetsAsc = new PriorityQueue<>(
+                (Sommet s1, Sommet s2) ->
+                        degre(s2)==degre(s1) ?
+                                Integer.compare(s1.getIndice(), s2.getIndice()) :
+                                Integer.compare(degre(s1), degre(s2))
+        );
+        sommetsAsc.addAll(sommets);
+        return sommetsAsc;
     }
 
     /**
@@ -576,9 +634,9 @@ public class Graphe {
      */
     public List<Integer> getSequenceDegres() {
         List<Integer> sequence = new ArrayList<>();
-        PriorityQueue<Sommet> sommetDesc = getSommetsDegresDecroissant();
-        while (!sommetDesc.isEmpty()) {
-            sequence.add(degre(sommetDesc.remove()));
+        PriorityQueue<Sommet> sommetsAsc = getSommetsDegresCroissant();
+        while (!sommetsAsc.isEmpty()) {
+            sequence.add(degre(sommetsAsc.remove()));
         }
         return sequence;
     }
@@ -598,17 +656,30 @@ public class Graphe {
     }
 
     /**
+     * Trie les sommets de this en fonction de leur degré (Croissant) et renvoie une nouvelle List contenant,
+     * seulement les sommets de degré supérieur à ordre-1
+     */
+    public LinkedList<Sommet> getSommetsDegresCroissantDegreSuperieurAOrdre(int ordre) {
+        PriorityQueue<Sommet> sommetsAsc = getSommetsDegresCroissant();
+        LinkedList<Sommet> res = new LinkedList<>();
+        Sommet currSommet;
+        while (!sommetsAsc.isEmpty()) {
+            if (degre(currSommet = sommetsAsc.remove()) >= ordre-1) {
+                res.add(currSommet);
+            }
+        }
+        return res;
+    }
+
+    /**
      * Renvoie la sequence de degré de this pour seulement les sommets de degré supérieur à ordre-1
      */
     public List<Integer> getSequenceDegres(int ordre) {
         List<Integer> sequence = new ArrayList<>();
-        LinkedList<Sommet> sommetsDesc = getSommetsDegresDecroissantDegreSuperieurAOrdre(ordre);
-        while (!sommetsDesc.isEmpty()) {
-            sequence.add(degre(sommetsDesc.remove()));
+        LinkedList<Sommet> sommetsAsc = getSommetsDegresCroissantDegreSuperieurAOrdre(ordre);
+        while (!sommetsAsc.isEmpty()) {
+            sequence.add(degre(sommetsAsc.remove()));
         }
         return sequence;
     }
-
-
-
 }

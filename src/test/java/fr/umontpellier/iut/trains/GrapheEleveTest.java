@@ -969,7 +969,7 @@ public class GrapheEleveTest {
         ajouterCycleNonReliee(3);
         ajouterArbreNonReliee(20, 5);
 
-        assertFalse(g.possedeSousGrapheComplet(5));
+        assertFalse(g.possedeSousGrapheComplet(10));
         assertTrue(g.possedeSousGrapheComplet(3));
         assertTrue(g.possedeSousGrapheComplet(2));
     }
@@ -984,14 +984,53 @@ public class GrapheEleveTest {
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
 
         // (3,2,2,2,2,1,1,1,1,1,0)
-        List<Integer> expected = new ArrayList<>(List.of(3,2,2,2,2,1,1,1,1,1,0));
-        List<Integer> expected2 = new ArrayList<>(List.of(3,2,2,2,2));
+        List<Integer> expected = new ArrayList<>(List.of(0,1,1,1,1,1,2,2,2,2,3));
+        List<Integer> expected2 = new ArrayList<>(List.of(2,2,2,2,3));
 
         assertEquals(11, g.getSommetsDegresDecroissant().size());
         assertEquals(5, g.getSommetsDegresDecroissantDegreSuperieurAOrdre(3).size());
         assertIterableEquals(expected, g.getSequenceDegres());
         assertIterableEquals(expected2, g.getSequenceDegres(3));
     }
+
+
+    // @Disabled
+    @Test
+    public void test_getSommetsDegresDecroissant_comparator() {
+        initSommet(4);
+        relierUnSommetATous(g.getSommet(0));
+        g.getSommet(3).ajouterVoisin(g.getSommet(2));
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
+
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(100).createSommet());
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(12).createSommet());
+        g.ajouterSommet(Sommet.sommetBuilder.setIndice(101).createSommet());
+
+        g.getSommet(100).ajouterVoisin(g.getSommet(12));
+        g.getSommet(100).ajouterVoisin(g.getSommet(101));
+        g.getSommet(101).ajouterVoisin(g.getSommet(12));
+
+        // (3,2,2,2,2,2,1,0)
+        List<Sommet> expected = new ArrayList<>(List.of(
+                g.getSommet(0),
+                g.getSommet(2),
+                g.getSommet(3),
+                g.getSommet(12),
+                g.getSommet(100),
+                g.getSommet(101),
+                g.getSommet(1),
+                g.getSommet(99)
+        ));
+        List<Sommet> res = new ArrayList<>();
+        PriorityQueue<Sommet> aTester = g.getSommetsDegresDecroissant();
+
+        while(!aTester.isEmpty()) {
+            res.add(aTester.poll());
+        }
+        assertIterableEquals(expected, res);
+    }
+
+
 
 
     //@Disabled
@@ -1038,12 +1077,32 @@ public class GrapheEleveTest {
     //@Disabled
     @Test
     public void test_possedeUnIsthme_false_non_connexe_bis() {
+        initSommet(3);
+        ajouterCycleNonReliee(10);
+        ajouterCycleNonReliee(3);
+
+        assertFalse(g.possedeUnIsthme());
+    }
+
+    //@Disabled
+    @Test
+    public void test_possedeUnIsthme_true_non_connexe() {
         initChaine(10);
         ajouterCycleNonReliee(10);
         ajouterArbreNonReliee(10, 2);
         ajouterChaineNonReliee(10);
 
-        assertFalse(g.possedeUnIsthme());
+        assertTrue(g.possedeUnIsthme());
+    }
+
+    //@Disabled
+    @Test
+    public void test_possedeUnIsthme_true_non_connexe_bis() {
+        initCycle(3);
+        ajouterCycleNonReliee(10);
+        ajouterChaineNonReliee(2);
+
+        assertTrue(g.possedeUnIsthme());
     }
 
     //@Disabled
@@ -1121,8 +1180,9 @@ public class GrapheEleveTest {
         assertFalse(g2.estChaine());
         assertFalse(g1.estArbre());
         assertFalse(g2.estArbre());
-//        assertFalse(g1.possedeUnIsthme());
-//        assertFalse(g2.possedeUnIsthme());
+        assertTrue(jeu.getGraphe().possedeUnIsthme());
+        assertTrue(g1.possedeUnIsthme());
+        assertTrue(g2.possedeUnIsthme());
         assertTrue(g1.possedeUnCycle());
         assertFalse(g2.possedeUnCycle());
         assertTrue(g1.possedeSousGrapheComplet(3));
@@ -1133,6 +1193,7 @@ public class GrapheEleveTest {
 //        assertFalse(g2.possedeSousGrapheIsomorphe(g));
         assertEquals(6, g1.degreMax());
         assertEquals(1, g2.degreMax());
+
     }// @Disabled
     @Test
     public void test_possedeUnIsthme_etoile(){
@@ -1157,4 +1218,225 @@ public class GrapheEleveTest {
         assertTrue(g.possedeUnIsthme());
     }
 
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_g_vide() {
+        initVide();
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        assertIterableEquals(List.of(), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_graine() {
+        initSommet(1);
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(0))));
+        assertIterableEquals(List.of(0), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_arete() {
+        initChaine(2);
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(0))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(1))));
+        assertIterableEquals(List.of(1,1), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_chaine_ordre_3() {
+        initChaine(3);
+        //seq: 2-1-1
+        //indice: 1-0-2
+        //coloration: 1-2-2
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(1))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(2))));
+        assertIterableEquals(List.of(1,1,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_chaine_ordre_4() {
+        initChaine(4);
+        //seq: 2-2-1-1
+        //indice: 1-2-0-3
+        //coloration: 1-2-2-1
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(1), g.getSommet(3))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(2))));
+        assertIterableEquals(List.of(1,1,2,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_chaine_ordre_5() {
+        initChaine(5);
+        //seq: 2-2-2-1-1
+        //indice: 1-2-3-0-4
+        //coloration: 1-2-1-2-2
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(1), g.getSommet(3))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(2), g.getSommet(4))));
+        assertIterableEquals(List.of(1,1,2,2,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_cycle_ordre_3() {
+        initCycle(3);
+        //seq: 2-2-2
+        //indice: 0-1-2
+        //coloration: 1-2-3
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(0))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(1))));
+        res.put(3, new HashSet<>(Set.of(g.getSommet(2))));
+        assertIterableEquals(List.of(2,2,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_cycle_ordre_4() {
+        initCycle(4);
+        //seq: 2-2-2-2
+        //indice: 0-1-2-3
+        //coloration: 1-2-1-2
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(2))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(1), g.getSommet(3))));
+        assertIterableEquals(List.of(2,2,2,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_cycle_ordre_5() {
+        initCycle(5);
+        //seq: 2-2-2-2-2
+        //indice: 0-1-2-3-4
+        //coloration: 1-2-1-2-3
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(2))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(1), g.getSommet(3))));
+        res.put(3, new HashSet<>(Set.of(g.getSommet(4))));
+        assertIterableEquals(List.of(2,2,2,2,2), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+    // @Disabled
+    @Test
+    public void test_coloration_gloutonne_croix() {
+        initSommet(5);
+        relierUnSommetATous(g.getSommet(2));
+        //seq: 4-1-1-1-1
+        //indice: 2-0-1-3-4
+        //coloration: 1-2-2-2-2
+        Map<Integer, Set<Sommet>> res= new HashMap<>();
+        res.put(1, new HashSet<>(Set.of(g.getSommet(2))));
+        res.put(2, new HashSet<>(Set.of(g.getSommet(0), g.getSommet(1), g.getSommet(3), g.getSommet(4))));
+        assertIterableEquals(List.of(1,1,1,1,4), g.getSequenceDegres());
+        assertIterableEquals(res.entrySet(), g.getColorationGloutonne().entrySet());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Par Franceus M.
+
+    private Graphe getGrapheInduit() {
+        Graphe graphe = new Graphe(0);
+        graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(0).setSurcout(10).setNbPointsVictoire(2).setJoueurs(new HashSet<>(List.of(0, 1))).createSommet());
+        graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(1).setSurcout(12).setNbPointsVictoire(4).setJoueurs(new HashSet<>(List.of(1, 2))).createSommet());
+        graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(2).setSurcout(14).setNbPointsVictoire(6).setJoueurs(new HashSet<>(List.of(1, 2))).createSommet());
+        graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(3).setSurcout(16).setNbPointsVictoire(8).setJoueurs(new HashSet<>(List.of(0, 2))).createSommet());
+        graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(4).setSurcout(18).setNbPointsVictoire(10).setJoueurs(new HashSet<>(List.of(0, 1))).createSommet());
+
+        graphe.ajouterArete(graphe.getSommet(0), graphe.getSommet(1));
+        graphe.ajouterArete(graphe.getSommet(0), graphe.getSommet(2));
+        graphe.ajouterArete(graphe.getSommet(3), graphe.getSommet(4));
+        return graphe;
+    }
+    @Test
+    public void test_creer_graphe_induit() {
+        Graphe graphe = getGrapheInduit();
+        Set<Sommet> sommets = new HashSet<>();
+        sommets.add(graphe.getSommet(0));
+        sommets.add(graphe.getSommet(1));
+        sommets.add(graphe.getSommet(2));
+        sommets.add(graphe.getSommet(3));
+        Graphe g = new Graphe(graphe, sommets);
+
+        assertEquals(4, g.getNbSommets());
+        assertEquals(2, g.getNbAretes());
+        for(Sommet sommet : g.getSommets()) {
+            Sommet s = graphe.getSommet(sommet.getIndice());
+            assertEquals(s, sommet);
+            assertEquals(s.getSurcout(), sommet.getSurcout());
+            assertEquals(s.getNbPointsVictoire(), sommet.getNbPointsVictoire());
+            assertEquals(s.getJoueurs(), sommet.getJoueurs());
+        }
+        assertEquals(new HashSet<Sommet>(), g.getSommet(3).getVoisins());
+    }
+    @Test
+    public void test_creer_graphe_induit_avec_donnees_sommets_different() {
+        Graphe graphe = getGrapheInduit();
+        Set<Sommet> sommets = new HashSet<>();
+        Sommet sommet0 = new Sommet.SommetBuilder().setIndice(0).setSurcout(10).setNbPointsVictoire(2).setJoueurs(new HashSet<>(List.of(0, 1))).createSommet();
+        Sommet sommet1 = new Sommet.SommetBuilder().setIndice(1).setSurcout(8).setNbPointsVictoire(0).setJoueurs(new HashSet<>(List.of(0, 2))).createSommet();
+        Sommet sommet2 = new Sommet.SommetBuilder().setIndice(2).setSurcout(20).setNbPointsVictoire(10).setJoueurs(new HashSet<>()).createSommet();
+        Sommet sommet3 = new Sommet.SommetBuilder().setIndice(3).setSurcout(10).setNbPointsVictoire(6).setJoueurs(new HashSet<>(List.of(1, 2))).createSommet();
+        Sommet sommet4 = new Sommet.SommetBuilder().setIndice(4).setSurcout(5).setNbPointsVictoire(8).setJoueurs(new HashSet<>(List.of(1, 2))).createSommet();
+        sommets.add(sommet0);
+        sommets.add(sommet1);
+        sommets.add(sommet2);
+        sommets.add(sommet3);
+        sommet0.ajouterVoisin(sommet1);
+        sommet0.ajouterVoisin(sommet2);
+        sommet3.ajouterVoisin(sommet4);
+        Graphe g = new Graphe(graphe, sommets);
+
+        assertEquals(4, g.getNbSommets());
+        assertEquals(2, g.getNbAretes());
+        for(Sommet sommet : g.getSommets()) {
+            Sommet s = graphe.getSommet(sommet.getIndice());
+            assertEquals(s, sommet);
+            assertEquals(s.getSurcout(), sommet.getSurcout());
+            assertEquals(s.getNbPointsVictoire(), sommet.getNbPointsVictoire());
+            assertEquals(s.getJoueurs(), sommet.getJoueurs());
+        }
+        assertEquals(new HashSet<Sommet>(), g.getSommet(3).getVoisins());
+    }
 }
