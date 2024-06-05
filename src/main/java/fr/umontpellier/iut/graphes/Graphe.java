@@ -11,7 +11,6 @@ import java.util.*;
 
 public class Graphe {
     private final Set<Sommet> sommets;
-
     private boolean check = false;
 
     public Graphe(Set<Sommet> sommets) {
@@ -360,7 +359,7 @@ public class Graphe {
 
     public void ajouterArete(Sommet s, Sommet t) {
         try {
-            if (sommets.contains(s) && sommets.contains(t)) {
+            if (!s.equals(t) && sommets.contains(s) && sommets.contains(t)) {
                 s.ajouterVoisin(t);
                 t.ajouterVoisin(s);
             }
@@ -383,7 +382,6 @@ public class Graphe {
         //INIT
         Map<Integer, Set<Sommet>> coloration = new HashMap<>();
         PriorityQueue<Sommet> sommetDesc = getSommetsDegresDecroissant();
-        Set<Sommet> voisins;
         Iterator<Sommet> it;
         Set<Sommet> current;
         Sommet s;
@@ -392,8 +390,7 @@ public class Graphe {
             int i = 1;
             boolean aTrouveCouleur = false;
             s = sommetDesc.poll();
-            voisins = s.getVoisins();
-            it = voisins.iterator();
+            it = s.getVoisins().iterator();
             current = coloration.get(i);
             while (!aTrouveCouleur && it.hasNext()) {
                 if (current==null || !current.contains(it.next())) {
@@ -494,6 +491,13 @@ public class Graphe {
      */
     public Map<Integer, Set<Sommet>> getColorationPropreOptimale() {
         throw new RuntimeException("Méthode à implémenter");
+        //planaire donc nbchroma <= 4
+        // verfier ordre maximal d'un sous graphe complet
+        // si possede sous graphe complet d'ordre 4 alors nbchroma=4
+        // si possede sous grapghe complet d'ordre 3 alors nbchroma=3 ou 4
+        // si possede sous graphe complet d'ordre 2 alors 2 à 4
+        // si 1 alors pas d arêtes, 1 seul couleur pour tous les sommets
+        // si 0 alors vide
     }
 
     /**

@@ -97,9 +97,8 @@ public class Sommet {
     }
 
     public void ajouterVoisin(Sommet voisin) {
-        if (voisin != this && voisin !=null) {
+        if (voisin!=null) {
             voisins.add(voisin);
-            voisin.getVoisins().add(this);
         }
     }
 

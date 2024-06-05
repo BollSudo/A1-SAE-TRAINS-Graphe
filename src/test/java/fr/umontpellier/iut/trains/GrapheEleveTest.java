@@ -28,7 +28,7 @@ public class GrapheEleveTest {
 
     public void relierUnSommetATous(Sommet s){
         for (Sommet v : g.getSommets()) {
-            s.ajouterVoisin(v);
+            g.ajouterArete(s, v);
         }
     }
 
@@ -38,10 +38,15 @@ public class GrapheEleveTest {
         }
     }
 
+    public void ajouterAretePratique(int s1, int s2) {
+        g.getSommet(s1).ajouterVoisin(g.getSommet(s2));
+        g.getSommet(s2).ajouterVoisin(g.getSommet(s1));
+    }
+
     public void initChaine(int i) {
         initSommet(i);
         for (int j = 0; j < i-1; j++) {
-            g.getSommet(j).ajouterVoisin(g.getSommet(j+1));
+            ajouterAretePratique(j, j+1);
         }
     }
 
@@ -49,9 +54,9 @@ public class GrapheEleveTest {
         if (i > 2) {
             initSommet(i);
             for (int j = 0; j < i-1; j++) {
-                g.getSommet(j).ajouterVoisin(g.getSommet(j+1));
+                ajouterAretePratique(j, j+1);
             }
-            g.getSommet(i-1).ajouterVoisin(g.getSommet(0));
+           ajouterAretePratique(i-1, 0);
         }
     }
 
@@ -65,7 +70,7 @@ public class GrapheEleveTest {
             sIndiceAdd.add(j+offset);
         }
         for (int j = 0; j < i -1; j++) {
-            g.getSommet(j+offset).ajouterVoisin(g.getSommet(j+offset+1));
+            ajouterAretePratique(j+offset, j+offset+1);
         }
         return sIndiceAdd;
     }
@@ -81,9 +86,9 @@ public class GrapheEleveTest {
                 sIndiceAdd.add(j+offset);
             }
             for (int j = 0; j < i -1; j++) {
-                g.getSommet(j+offset).ajouterVoisin(g.getSommet(j+offset+1));
+                ajouterAretePratique(j+offset, j+offset+1);
             }
-            g.getSommet(offset).ajouterVoisin(g.getSommet(offset+i-1));
+            ajouterAretePratique(offset, offset+i-1);
         }
         return sIndiceAdd;
     }
@@ -93,7 +98,7 @@ public class GrapheEleveTest {
         List<Integer> indiceTronc = ajouterChaineNonReliee(longueurTronc);
         for (Integer indice : indiceTronc) {
             List<Integer> indiceBranche = ajouterChaineNonReliee(longueurBranche);
-            g.getSommet(indice).ajouterVoisin(g.getSommet(indiceBranche.get(0)));
+            ajouterAretePratique(indice, indiceBranche.get(0));
         }
     }
 
@@ -108,8 +113,8 @@ public class GrapheEleveTest {
         Sommet s2 = g.getSommet(2);
         Sommet s3 = g.getSommet(3);
 
-        s1.ajouterVoisin(s0);
-        s1.ajouterVoisin(s2);
+        ajouterAretePratique(s1.getIndice(), s0.getIndice());
+        ajouterAretePratique(s1.getIndice(), s2.getIndice());
 
         assertTrue(s1.getVoisins().containsAll(Set.of(s2, s0)));
         assertFalse(s1.getVoisins().contains(s3));
@@ -192,7 +197,7 @@ public class GrapheEleveTest {
     @Test
     public void test_estChaine_true_bis() {
         initChaine(23);
-        g.getSommet(0).ajouterVoisin(g.getSommet(ajouterChaineNonReliee(32).get(0)));
+        ajouterAretePratique(0, ajouterChaineNonReliee(32).get(0));
 
         assertTrue(g.estChaine());
     }
@@ -210,7 +215,7 @@ public class GrapheEleveTest {
     @Test
     public void test_estChaine_false() {
         initSommet(4);
-        g.getSommet(1).ajouterVoisin(g.getSommet(2));
+        ajouterAretePratique(1, 2);
 
         assertFalse(g.estChaine());
     }
@@ -284,7 +289,7 @@ public class GrapheEleveTest {
         initSommet(23);
         Sommet g0 = g.getSommet(0);
         for (int i=1; i< 10; i++) {
-            g0.ajouterVoisin(g.getSommet(i));
+            ajouterAretePratique(g0.getIndice(), i);
         }
         assertEquals(9, g.degreMax());
     }
@@ -373,7 +378,7 @@ public class GrapheEleveTest {
     public void test_est_connexe_true_2() {
         initSommet(23);
         relierAllSommets();
-        g.getSommet(0).ajouterVoisin(g.getSommet(ajouterChaineNonReliee(3).get(0)));
+        ajouterAretePratique(0, ajouterChaineNonReliee(3).get(0));
 
         assertEquals(1, g.getEnsembleClassesConnexite().size());
         assertTrue(g.estConnexe());
@@ -503,7 +508,9 @@ public class GrapheEleveTest {
     public void test_supprimer_arete_sommets_non_inclus_dans_g() {
         initSommet(1);
         Sommet s = new Sommet(Sommet.sommetBuilder.setIndice(10).createSommet());
-        g.getSommet(0).ajouterVoisin(s); //bidouille
+        //bidouille
+        s.ajouterVoisin(g.getSommet(0));
+        g.getSommet(0).ajouterVoisin(s);
         g.supprimerArete(g.getSommet(0), s);
 
         assertEquals(0, g.getNbAretes());
@@ -544,7 +551,7 @@ public class GrapheEleveTest {
         initSommet(10);
         relierAllSommets();
         Set<Sommet> sommets = new HashSet<>(g.getSommets());
-        g.getSommet(0).ajouterVoisin(g.getSommet(ajouterChaineNonReliee(32).get(0)));
+        ajouterAretePratique(0, ajouterChaineNonReliee(32).get(0));
 
         Graphe res = Graphe.fusionnerEnsembleSommets(g, sommets);
         Sommet s = res.getSommet(0);
@@ -679,7 +686,7 @@ public class GrapheEleveTest {
     @Test
     public void test_est_cycle_false_bis3() {
         initChaine(4);
-        g.getSommet(0).ajouterVoisin(g.getSommet(2));
+        ajouterAretePratique(0, 2);
 
         assertFalse(g.estCycle());
     }
@@ -963,7 +970,7 @@ public class GrapheEleveTest {
     public void test_possedeSousGrapheComplet_4() {
         initSommet(10);
         relierUnSommetATous(g.getSommet(0));
-        g.getSommet(2).ajouterVoisin(g.getSommet(7));
+        ajouterAretePratique(2, 7);
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
         ajouterChaineNonReliee(10);
         ajouterCycleNonReliee(3);
@@ -999,16 +1006,16 @@ public class GrapheEleveTest {
     public void test_getSommetsDegresDecroissant_comparator() {
         initSommet(4);
         relierUnSommetATous(g.getSommet(0));
-        g.getSommet(3).ajouterVoisin(g.getSommet(2));
+        ajouterAretePratique(3, 2);
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(99).createSommet());
 
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(100).createSommet());
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(12).createSommet());
         g.ajouterSommet(Sommet.sommetBuilder.setIndice(101).createSommet());
 
-        g.getSommet(100).ajouterVoisin(g.getSommet(12));
-        g.getSommet(100).ajouterVoisin(g.getSommet(101));
-        g.getSommet(101).ajouterVoisin(g.getSommet(12));
+        ajouterAretePratique(100, 12);
+        ajouterAretePratique(100, 101);
+        ajouterAretePratique(101, 12);
 
         // (3,2,2,2,2,2,1,0)
         List<Sommet> expected = new ArrayList<>(List.of(
@@ -1145,7 +1152,7 @@ public class GrapheEleveTest {
     public void test_possedeUnIsthme_true_3() {
         initCycle(3);
         Integer indice = ajouterCycleNonReliee(10).get(0);
-        g.getSommet(indice).ajouterVoisin(g.getSommet(0));
+        ajouterAretePratique(indice, 0);
 
         assertTrue(g.possedeUnIsthme());
     }
@@ -1423,9 +1430,9 @@ public class GrapheEleveTest {
         sommets.add(sommet1);
         sommets.add(sommet2);
         sommets.add(sommet3);
-        sommet0.ajouterVoisin(sommet1);
-        sommet0.ajouterVoisin(sommet2);
-        sommet3.ajouterVoisin(sommet4);
+        sommet0.ajouterVoisin(sommet1);sommet1.ajouterVoisin(sommet0);
+        sommet0.ajouterVoisin(sommet2);sommet2.ajouterVoisin(sommet0);
+        sommet3.ajouterVoisin(sommet4);sommet4.ajouterVoisin(sommet3);
         Graphe g = new Graphe(graphe, sommets);
 
         assertEquals(4, g.getNbSommets());
