@@ -266,42 +266,13 @@ public class Graphe {
      * @return true si et seulement si this est un cycle. On considère que le graphe vide n'est pas un cycle.
      */
     public boolean estCycle() {
-        if (getNbSommets() < 3 || getNbAretes() < 3) {
-            return false;
-        } else {
-            Sommet sDepart = sommets.iterator().next();
-            Sommet currentSommet = sDepart;
-            Set<Sommet> sommetsParcourus = new HashSet<>();
-            Set<Sommet> sommetsVoisins;
-            boolean aCycle = false;
-            boolean fini = false;
-            while (!fini) {
-                if (degre(currentSommet) != 2) {
-                    fini = true;
-                } else {
-                    sommetsVoisins = currentSommet.getVoisins();
-                    Iterator<Sommet> it = sommetsVoisins.iterator();
-                    int compteurVoisinsDejaParcourus = 0;
-                    boolean aVoisinsPasParcourus = false;
-                    while (!aVoisinsPasParcourus && compteurVoisinsDejaParcourus < 2) {
-                        Sommet voisin = it.next();
-                        if (sommetsParcourus.contains(voisin)) {
-                            compteurVoisinsDejaParcourus++;
-                        } else {
-                            sommetsParcourus.add(currentSommet);
-                            currentSommet = voisin;
-                            aVoisinsPasParcourus = true;
-                        }
-                    }
-                    if (compteurVoisinsDejaParcourus == 2) {
-                        sommetsParcourus.add(currentSommet);
-                        aCycle = true;
-                        fini = true;
-                    }
-                }
+        List<Integer> seq = getSequenceDegres();
+        for (Integer i : seq) {
+            if (i!=2) {
+                return false;
             }
-            return aCycle && (sommetsParcourus.size()==getNbSommets()) && (currentSommet.getVoisins().contains(sDepart));
         }
+        return estConnexe();
     }
 
     /**
