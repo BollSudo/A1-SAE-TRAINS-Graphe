@@ -272,7 +272,7 @@ public class Graphe {
                 return false;
             }
         }
-        return estConnexe();
+        return !seq.isEmpty() && estConnexe();
     }
 
     /**
@@ -479,7 +479,8 @@ public class Graphe {
      * @return true si et seulement si this est connexe.
      */
     public boolean estConnexe() {
-        return getEnsembleClassesConnexite().size()==1;
+        //on considère que le graphe vide est un arbre donc il est connexe
+        return getEnsembleClassesConnexite().size()<=1;
     }
 
     /**

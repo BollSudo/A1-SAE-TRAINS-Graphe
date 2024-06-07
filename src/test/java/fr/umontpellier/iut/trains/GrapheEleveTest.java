@@ -305,11 +305,11 @@ public class GrapheEleveTest {
 
     // @Disabled
     @Test
-    public void test_est_connexe_faux_vide() {
+    public void test_est_connexe_true_vide() {
         initVide();
 
         assertEquals(0, g.getEnsembleClassesConnexite().size());
-        assertFalse(g.estConnexe());
+        assertTrue(g.estConnexe());
     }
 
     // @Disabled
