@@ -421,15 +421,48 @@ public class Graphe {
      * pré-requis : l'ensemble de départ et le sommet d'arrivée sont inclus dans l'ensemble des sommets de this
      */
     public int getDistance(Set<Sommet> depart, Sommet arrivee) {
-        throw new RuntimeException("Méthode à implémenter");
+        int min = -1;
+        for (Sommet d : depart){
+            if (min == -1 || min > getDistance(d, arrivee)){
+                min = getDistance(d, arrivee);
+            }
+        }
+        return min;
     }
 
     /**
      * @return le surcout total minimal du parcours entre le sommet de depart et le sommet d'arrivée
      */
+
     public int getDistance(Sommet depart, Sommet arrivee) {
-        throw new RuntimeException("Méthode à implémenter");
-        //DJIKSTRA
+        Map<Sommet, Integer> sommetParcouru = new HashMap<>();
+        PriorityQueue<Sommet> valeurParcouru= new PriorityQueue<>(new Comparator<Sommet>() {
+            @Override
+            public int compare(Sommet o1, Sommet o2) {
+                return sommetParcouru.get(o1) - sommetParcouru.get(o2);
+            }
+        });
+        Set<Sommet> visiter = new HashSet<>();
+        sommetParcouru.put(depart, 0);
+        valeurParcouru.add(depart);
+        Sommet actuel = depart;
+        while (!valeurParcouru.isEmpty() && actuel != arrivee){
+            actuel = valeurParcouru.poll();
+            visiter.add(actuel);
+            for (Sommet s : actuel.getVoisins()){
+                if (!visiter.contains(s)){
+                    if (sommetParcouru.containsKey(s)){
+                        if (sommetParcouru.get(actuel)+s.getSurcout() < sommetParcouru.get(s)){
+                            sommetParcouru.put(s, sommetParcouru.get(actuel)+s.getSurcout());
+                        }
+                    }else {
+                        sommetParcouru.put(s, sommetParcouru.get(actuel)+s.getSurcout());
+                        valeurParcouru.add(s);
+                    }
+                }
+            }
+        }
+        return sommetParcouru.get(arrivee);
     }
 
     /**
