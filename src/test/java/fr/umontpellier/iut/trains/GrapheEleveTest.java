@@ -195,6 +195,15 @@ public class GrapheEleveTest {
 
     // @Disabled
     @Test
+    public void test_estChaine_false_non_connexe_chaine_et_cycle() {
+        initChaine(4);
+        ajouterCycleNonReliee(3);
+
+        assertFalse(g.estChaine());
+    }
+
+    // @Disabled
+    @Test
     public void test_estChaine_true_bis() {
         initChaine(23);
         ajouterAretePratique(0, ajouterChaineNonReliee(32).get(0));
@@ -1359,6 +1368,43 @@ public class GrapheEleveTest {
     }
 
 
+    @Disabled
+    @Test
+    public void test_distances_tokyo_bis() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.TOKYO);
+        Graphe graphe = jeu.getGraphe();
+        Set<Sommet> sommets = Set.of(
+                graphe.getSommet(0),
+                graphe.getSommet(13),
+                graphe.getSommet(3)
+        );
+
+        assertEquals(4, graphe.getDistance(graphe.getSommet(0), graphe.getSommet(54)));
+        assertEquals(0, graphe.getDistance(graphe.getSommet(13), graphe.getSommet(54)));
+        assertEquals(0, graphe.getDistance(graphe.getSommet(3), graphe.getSommet(54)));
+
+        assertEquals(0, graphe.getDistance(sommets, graphe.getSommet(54)));
+
+    }
+
+    // @Disabled
+    @Test
+    public void test_distances_osaka_bis() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+        Set<Sommet> sommets = Set.of(
+                graphe.getSommet(18),
+                graphe.getSommet(17),
+                graphe.getSommet(7)
+        );
+
+        assertEquals(3, graphe.getDistance(graphe.getSommet(18), graphe.getSommet(9)));
+        assertEquals(3, graphe.getDistance(graphe.getSommet(17), graphe.getSommet(9)));
+        assertEquals(4, graphe.getDistance(graphe.getSommet(7), graphe.getSommet(9)));
+
+        assertEquals(3, graphe.getDistance(sommets, graphe.getSommet(9)));
+
+    }
 
 
 

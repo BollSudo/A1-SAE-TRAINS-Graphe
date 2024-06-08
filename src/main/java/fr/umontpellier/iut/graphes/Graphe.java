@@ -207,59 +207,21 @@ public class Graphe {
      */
     public boolean estChaine() {
         //CAS PARTICULIERS
-        if (sommets.isEmpty() || sommets.size()==1) {
+        if (sommets.size()<2) {
             return true;
-        }
-
-        //INIT
-        List<Sommet> sommetsParcourus = new ArrayList<>();
-        boolean estChaine = true;
-        boolean aTrouveSommetDegUn = false;
-
-        Iterator<Sommet> it = sommets.iterator();
-        Sommet currentSommet = null;
-        int currentSommetDeg = 0;
-
-        while (it.hasNext() && estChaine && !aTrouveSommetDegUn) {
-            currentSommet = it.next();
-            currentSommetDeg = degre(currentSommet);
-            if (currentSommetDeg == 0 || currentSommetDeg > 2) {
-                estChaine = false;
-            } else if (currentSommetDeg == 1) {
-                aTrouveSommetDegUn = true;
-            }
-        }
-
-        //BOUCLE
-        if (!aTrouveSommetDegUn) {
-            estChaine = false;
         } else {
-            boolean finChaine = false;
-            while (estChaine && !finChaine) {
-                if (currentSommetDeg > 2) {
-                    estChaine = false;
-                } else {
-                    int nbVoisinsDejaParcourus = 0;
-                    for (Sommet voisin : currentSommet.getVoisins()) {
-                        if (sommetsParcourus.contains(voisin)) {
-                            nbVoisinsDejaParcourus++;
-                            if (nbVoisinsDejaParcourus == 2) {
-                                estChaine = false;
-                            }
-                        } else {
-                            sommetsParcourus.add(currentSommet);
-                            currentSommet = voisin;
-                            currentSommetDeg = degre(voisin);
-                            if (currentSommetDeg == 1) {
-                                sommetsParcourus.add(voisin);
-                                finChaine = true;
-                            }
-                        }
-                    }
+            List<Integer> seq = getSequenceDegres();
+            ListIterator<Integer> it = seq.listIterator(2);
+            if (seq.get(0)!=1 && seq.get(1)!=1) {
+                return false;
+            }
+            while (it.hasNext()) {
+                if (it.next() != 2) {
+                    return false;
                 }
             }
         }
-        return estChaine && (sommetsParcourus.size()==getNbSommets());
+        return estConnexe();
     }
 
     /**
