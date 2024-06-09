@@ -1406,25 +1406,43 @@ public class GrapheEleveTest {
 
     }
 
+    // @Disabled
+    @Test
+    public void test_sommet_in_triangle_true_cycle() {
+        initCycle(3);
+        assertTrue(g.getSommet(0).isInTriangle());
+        assertTrue(g.getSommet(1).isInTriangle());
+        assertTrue(g.getSommet(2).isInTriangle());
+    }
 
+    // @Disabled
+    @Test
+    public void test_sommet_in_triangle_true_complet() {
+        initSommet(10);
+        relierAllSommets();
+        for (Sommet s : g.getSommets()) {
+            assertTrue(s.isInTriangle());
+        }
+    }
 
+    // @Disabled
+    @Test
+    public void test_sommet_in_triangle_false_chaine() {
+        initChaine(10);
+        for (Sommet s : g.getSommets()) {
+            assertFalse(s.isInTriangle());
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // @Disabled
+    @Test
+    public void test_sommet_in_triangle_false_arbre() {
+        initSommet(10);
+        relierUnSommetATous(g.getSommet(0));
+        for (Sommet s : g.getSommets()) {
+            assertFalse(s.isInTriangle());
+        }
+    }
 
 
 

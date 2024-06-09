@@ -148,4 +148,17 @@ public class Sommet {
             return new Sommet(i, surcout, joueurs, nbPointsVictoire);
         }
     }
+
+    public boolean isInTriangle() {
+        if (voisins.size()>1) {
+            for (Sommet voisin : getVoisins()) {
+                for (Sommet voisin2 : getVoisins()) {
+                    if (voisin2.estVoisin(voisin)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
