@@ -1688,4 +1688,35 @@ public class GrapheEleveTest {
         }
         assertEquals(new HashSet<Sommet>(), g.getSommet(3).getVoisins());
     }
+    //@Disabled
+    @Test
+    public void test_sous_graphe_Isomorphe_Cercle(){
+        initCycle(500);
+        assertTrue(g.possedeSousGrapheIsomorphe(g));
+    }
+    //@Disabled
+    @Test
+    public void test_sous_graphe_Isomorphe_chaine(){
+        initChaine(5);
+        assertTrue(g.possedeSousGrapheIsomorphe(g));
+    }
+    //@Disabled
+    @Test
+    public void test_sous_graphe_Isomorphe_vide(){
+        initVide();
+        assertFalse(g.possedeSousGrapheIsomorphe(g));
+    }
+    //@Disabled
+    @Test
+    public void test_sous_graphe_Isomorphe_tout_relier(){
+        initSommet(5);
+        relierAllSommets();
+        assertTrue(g.possedeSousGrapheIsomorphe(g));
+    }
+    //@Disabled
+    @Test
+    public void test_sous_graphe_Isomorphe_sans_lieson(){
+        initSommet(5);
+        assertFalse(g.possedeSousGrapheIsomorphe(g));
+    }
 }
