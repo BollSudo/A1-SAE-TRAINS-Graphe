@@ -1368,7 +1368,7 @@ public class GrapheEleveTest {
     }
 
 
-    @Disabled
+    // @Disabled
     @Test
     public void test_distances_tokyo_bis() {
         Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.TOKYO);
@@ -1403,7 +1403,97 @@ public class GrapheEleveTest {
         assertEquals(4, graphe.getDistance(graphe.getSommet(7), graphe.getSommet(9)));
 
         assertEquals(3, graphe.getDistance(sommets, graphe.getSommet(9)));
+    }
 
+    // @Disabled
+    @Test
+    public void test_distances_osaka_coloration_optimale() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        Map<Integer, Set<Sommet>> res = graphe.getColorationPropreOptimale();
+        Set<Sommet> sommetsColores = new HashSet<>();
+        for (Set<Sommet> value : res.values()) {
+            sommetsColores.addAll(value);
+        }
+
+        for (Set<Sommet> value : res.values()) {
+            for (Sommet s : value) {
+                for (Sommet voisin : s.getVoisins()) {
+                    assertFalse(value.contains(voisin));
+                }
+            }
+        }
+        assertEquals(3, res.keySet().size());
+        assertEquals(Set.of(1,2,3), res.keySet());
+        assertEquals(graphe.getSommets(), sommetsColores);
+    }
+
+    // @Disabled
+    @Test
+    public void test_distances_tokyo_coloration_optimale() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        Map<Integer, Set<Sommet>> res = graphe.getColorationPropreOptimale();
+        Set<Sommet> sommetsColores = new HashSet<>();
+        for (Set<Sommet> value : res.values()) {
+            sommetsColores.addAll(value);
+        }
+
+        for (Set<Sommet> value : res.values()) {
+            for (Sommet s : value) {
+                for (Sommet voisin : s.getVoisins()) {
+                    assertFalse(value.contains(voisin));
+                }
+            }
+        }
+        assertEquals(3, res.keySet().size());
+        assertEquals(Set.of(1,2,3), res.keySet());
+        assertEquals(graphe.getSommets(), sommetsColores);
+    }
+
+    // @Disabled
+    @Test
+    public void test_distances_sous_graphe_osaka_chaine_non_connexe_coloration_optimale_cas_particulier() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe jeuGraphe = jeu.getGraphe();
+        Set<Sommet> sommets = new HashSet<>();
+        for (int i = 0; i < 12; i++) {
+            sommets.add(jeuGraphe.getSommet(i));
+        }
+        Graphe graphe = new Graphe(jeuGraphe, sommets);
+
+        Map<Integer, Set<Sommet>> res = graphe.getColorationPropreOptimale();
+
+        Map<Integer, Set<Sommet>> expected = new HashMap<>();
+        expected.put(1, new HashSet<>());
+        expected.put(2, new HashSet<>());
+        Set<Integer> indiceSommetsCouleur1 = new HashSet<>(Set.of(1,3,5,7,9,11));
+        Set<Integer> indiceSommetsCouleur2 = new HashSet<>(Set.of(0,2,4,6,8,10));
+        for (Integer i : indiceSommetsCouleur1) {
+            expected.get(1).add(graphe.getSommet(i));
+        }
+        for (Integer i : indiceSommetsCouleur2) {
+            expected.get(2).add(graphe.getSommet(i));
+        }
+
+        Set<Sommet> sommetsColores = new HashSet<>();
+        for (Set<Sommet> value : res.values()) {
+            sommetsColores.addAll(value);
+        }
+
+        for (Set<Sommet> value : res.values()) {
+            for (Sommet s : value) {
+                for (Sommet voisin : s.getVoisins()) {
+                    assertFalse(value.contains(voisin));
+                }
+            }
+        }
+        assertEquals(expected.entrySet(), res.entrySet());
+        assertEquals(2, res.keySet().size());
+        assertEquals(Set.of(1,2), res.keySet());
+        assertEquals(graphe.getSommets(), sommetsColores);
     }
 
     // @Disabled

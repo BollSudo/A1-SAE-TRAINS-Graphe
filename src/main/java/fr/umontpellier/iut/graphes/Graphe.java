@@ -45,15 +45,19 @@ public class Graphe {
     public Graphe(Graphe g, Set<Sommet> X) {
         sommets = new HashSet<>();
         Sommet newS;
-        for (Sommet s : X){
+        for (Sommet s : X) {
             newS = new Sommet(g.getSommet(s.getIndice()));
-            for (Sommet voisin : s.getVoisins()) {
-                if (!X.contains(voisin)) {
-                    newS.getVoisins().remove(voisin);
-                }
-            }
+            newS.getVoisins().clear();
             ajouterSommet(newS);
         }
+        for (Sommet s : sommets) {
+            for (Sommet voisin : g.getSommet(s.getIndice()).getVoisins()) {
+                if (X.contains(voisin)) {
+                    s.getVoisins().add(getSommet(voisin.getIndice()));
+                }
+            }
+        }
+
     }
 
     /**
@@ -65,7 +69,7 @@ public class Graphe {
         double somme = 0;
         int max = 0;
         int taille = 0;
-        for (int x : sequence){
+        for (int x : sequence) {
             somme = somme + x;
             if (x > max) max = x;
             if (x != 0) taille = taille + 1;
@@ -179,7 +183,7 @@ public class Graphe {
      * @return true si le sommet a été ajouté, false sinon
      */
     public boolean ajouterSommet(Sommet s) {
-        if (s==null) {
+        if (s == null) {
             return false;
         }
         return sommets.add(s);
@@ -199,7 +203,7 @@ public class Graphe {
      */
     public boolean estComplet() {
         int n = getNbSommets();
-        return getNbAretes() == n * (n-1) / 2;
+        return getNbAretes() == n * (n - 1) / 2;
     }
 
     /**
@@ -207,12 +211,12 @@ public class Graphe {
      */
     public boolean estChaine() {
         //CAS PARTICULIERS
-        if (sommets.size()<2) {
+        if (sommets.size() < 2) {
             return true;
         } else {
             List<Integer> seq = getSequenceDegres();
             ListIterator<Integer> it = seq.listIterator(2);
-            if (seq.get(0)!=1 && seq.get(1)!=1) {
+            if (seq.get(0) != 1 && seq.get(1) != 1) {
                 return false;
             }
             while (it.hasNext()) {
@@ -230,7 +234,7 @@ public class Graphe {
     public boolean estCycle() {
         List<Integer> seq = getSequenceDegres();
         for (Integer i : seq) {
-            if (i!=2) {
+            if (i != 2) {
                 return false;
             }
         }
@@ -266,28 +270,26 @@ public class Graphe {
      * @return true si et seulement si this a un isthme
      */
     public boolean possedeUnIsthme() {
-        // if chaine (oui) vide (non) ou cycle (non) nbaretes==0 (non)
-        //else pour chq composqnte connexe: parcourir les aretes, les enlever verfier si toujours connexe, les remettre
-        //si connexe et possede sommets de deg 1, forcemment un isthme
         Graphe composanteConnexe;
         for (Set<Sommet> classe : getEnsembleClassesConnexite()) {
             composanteConnexe = new Graphe(this, classe);
-
-            if (!composanteConnexe.estCycle() && composanteConnexe.getNbSommets()>1){
-                if (composanteConnexe.estChaine()){
+            if (!composanteConnexe.estCycle() && composanteConnexe.getNbSommets() > 1) {
+                if (composanteConnexe.estChaine()) {
                     return true;
                 } else {
-                    Sommet v;
-                    for (Sommet s : composanteConnexe.getSommets()){
-                        for (int x = 0; x< s.getVoisins().size(); x++){
-                            v = s.getVoisins().stream().toList().get(x);
-                            composanteConnexe.supprimerArete(s, v);
-                            if (!composanteConnexe.estConnexe()){
-                                composanteConnexe.ajouterArete(s, v);
-                                return true;
-                            }
-                            composanteConnexe.ajouterArete(s, v);
+                    Iterator<Sommet> it;
+                    Sommet s1;
+                    Sommet s2;
+                    for (Set<Sommet> arete : composanteConnexe.getAretes()) {
+                        it = arete.iterator();
+                        s1 = it.next();
+                        s2 = it.next();
+                        composanteConnexe.supprimerArete(s1, s2);
+                        if (!composanteConnexe.estConnexe()) {
+                            composanteConnexe.ajouterArete(s1, s2);
+                            return true;
                         }
+                        composanteConnexe.ajouterArete(s1, s2);
                     }
                 }
             }
@@ -301,14 +303,16 @@ public class Graphe {
                 s.ajouterVoisin(t);
                 t.ajouterVoisin(s);
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+        }
     }
 
     public void supprimerArete(Sommet s, Sommet t) {
         try {
             s.getVoisins().remove(t);
             t.getVoisins().remove(s);
-        } catch (NullPointerException ignored){}
+        } catch (NullPointerException ignored) {
+        }
     }
 
     /**
@@ -320,28 +324,15 @@ public class Graphe {
         //INIT
         Map<Integer, Set<Sommet>> coloration = new HashMap<>();
         PriorityQueue<Sommet> sommetDesc = getSommetsDegresDecroissant();
-        Iterator<Sommet> it;
-        Set<Sommet> current;
         Sommet s;
         //BOUCLE
-        while (!sommetDesc.isEmpty()){
-            int i = 1;
-            boolean aTrouveCouleur = false;
+        while (!sommetDesc.isEmpty()) {
             s = sommetDesc.poll();
-            it = s.getVoisins().iterator();
-            current = coloration.get(i);
-            while (!aTrouveCouleur && it.hasNext()) {
-                if (current==null || !current.contains(it.next())) {
-                     aTrouveCouleur = true;
-                } else {
-                    i++;
-                    current = coloration.get(i);
-                }
-            }
-            if (current == null) {
-                coloration.put(i, new HashSet<>(Set.of(s)));
+            int indiceCouleur = calulerCouleur(s, coloration);
+            if (coloration.get(indiceCouleur) == null) {
+                coloration.put(indiceCouleur, new HashSet<>(Set.of(s)));
             } else {
-                current.add(s);
+                coloration.get(indiceCouleur).add(s);
             }
         }
         return coloration;
@@ -355,8 +346,8 @@ public class Graphe {
      */
     public int getDistance(Set<Sommet> depart, Sommet arrivee) {
         int min = -1;
-        for (Sommet d : depart){
-            if (min == -1 || min > getDistance(d, arrivee)){
+        for (Sommet d : depart) {
+            if (min == -1 || min > getDistance(d, arrivee)) {
                 min = getDistance(d, arrivee);
             }
         }
@@ -369,7 +360,7 @@ public class Graphe {
 
     public int getDistance(Sommet depart, Sommet arrivee) {
         Map<Sommet, Integer> sommetParcouru = new HashMap<>();
-        PriorityQueue<Sommet> valeurParcouru= new PriorityQueue<>(new Comparator<Sommet>() {
+        PriorityQueue<Sommet> valeurParcouru = new PriorityQueue<>(new Comparator<Sommet>() {
             @Override
             public int compare(Sommet o1, Sommet o2) {
                 return sommetParcouru.get(o1) - sommetParcouru.get(o2);
@@ -379,17 +370,17 @@ public class Graphe {
         sommetParcouru.put(depart, 0);
         valeurParcouru.add(depart);
         Sommet actuel = depart;
-        while (!valeurParcouru.isEmpty() && actuel != arrivee){
+        while (!valeurParcouru.isEmpty() && actuel != arrivee) {
             actuel = valeurParcouru.poll();
             visiter.add(actuel);
-            for (Sommet s : actuel.getVoisins()){
-                if (!visiter.contains(s)){
-                    if (sommetParcouru.containsKey(s)){
-                        if (sommetParcouru.get(actuel)+s.getSurcout() < sommetParcouru.get(s)){
-                            sommetParcouru.put(s, sommetParcouru.get(actuel)+s.getSurcout());
+            for (Sommet s : actuel.getVoisins()) {
+                if (!visiter.contains(s)) {
+                    if (sommetParcouru.containsKey(s)) {
+                        if (sommetParcouru.get(actuel) + s.getSurcout() < sommetParcouru.get(s)) {
+                            sommetParcouru.put(s, sommetParcouru.get(actuel) + s.getSurcout());
                         }
-                    }else {
-                        sommetParcouru.put(s, sommetParcouru.get(actuel)+s.getSurcout());
+                    } else {
+                        sommetParcouru.put(s, sommetParcouru.get(actuel) + s.getSurcout());
                         valeurParcouru.add(s);
                     }
                 }
@@ -442,14 +433,14 @@ public class Graphe {
      */
     public boolean estConnexe() {
         //on considère que le graphe vide est un arbre donc il est connexe
-        return getEnsembleClassesConnexite().size()<=1;
+        return getEnsembleClassesConnexite().size() <= 1;
     }
 
     /**
      * @return le degré maximum des sommets du graphe
      */
     public int degreMax() {
-        int degreMax=0;
+        int degreMax = 0;
         for (Sommet s : sommets) {
             degreMax = Math.max(degre(s), degreMax);
         }
@@ -462,14 +453,57 @@ public class Graphe {
      * Pré-requis : le graphe est issu du plateau du jeu Train (entre autres, il est planaire).
      */
     public Map<Integer, Set<Sommet>> getColorationPropreOptimale() {
-        throw new RuntimeException("Méthode à implémenter");
-        //planaire donc nbchroma <= 4
-        // verfier ordre maximal d'un sous graphe complet
-        // si possede sous graphe complet d'ordre 4 alors nbchroma=4
-        // si possede sous grapghe complet d'ordre 3 alors nbchroma=3 ou 4
-        // si possede sous graphe complet d'ordre 2 alors 2 à 4
-        // si 1 alors pas d arêtes, 1 seul couleur pour tous les sommets
-        // si 0 alors vide
+        HashMap<Integer, Set<Sommet>> coloration = new HashMap<>();
+        //Colorer tuile horizontalement 3 couleurs
+        Graphe cc;
+        for (Set<Sommet> classe : getEnsembleClassesConnexite()) {
+            cc = new Graphe(this, classe); //Composante Connexe
+
+            //INIT
+            LinkedHashSet<Sommet> ordreOpti = new LinkedHashSet<>(); //Determination de l'ordre de la coloration
+            Sommet curr = cc.getSommetInclusDansUnTriangle();
+            //Cas particulier où on n'arrive pas à trouver de triangles (3 tuiles reliées entre eux)
+            if (curr == null) {
+                cc.getColorationGloutonne();
+                for (Map.Entry<Integer, Set<Sommet>> entry : cc.getColorationGloutonne().entrySet()) {
+                    int indiceCouleur = entry.getKey();
+                    if (coloration.get(indiceCouleur) == null) {
+                        coloration.put(indiceCouleur, entry.getValue());
+                    } else {
+                        coloration.get(indiceCouleur).addAll(entry.getValue());
+                    }
+                }
+            } else {
+                ordreOpti.add(curr);
+                ordreOpti.addAll(curr.getVoisins());
+                Set<Sommet> sommetsDeg1;
+                boolean toutEstColore = false;
+
+                while (!toutEstColore) {
+                    if (!ordreOpti.addAll(cc.getSommetsAyantNvoisinsDeEnsemble(ordreOpti, 2))) {
+                        sommetsDeg1 = cc.getSommetsAyantNvoisinsDeEnsemble(ordreOpti, 1);
+                        if (sommetsDeg1.isEmpty()) {
+                            toutEstColore = true;
+                        } else {
+                            ordreOpti.add(sommetsDeg1.iterator().next());
+                        }
+                    }
+                }
+                ordreOpti.addAll(cc.getSommetsAyantNvoisinsDeEnsemble(ordreOpti, 1));
+
+                //BOUCLE
+                for (Sommet s : ordreOpti) {
+                    int indiceCouleur = cc.calulerCouleur(s, coloration);
+
+                    if (coloration.get(indiceCouleur) == null) {
+                        coloration.put(indiceCouleur, new HashSet<>(Set.of(s)));
+                    } else {
+                        coloration.get(indiceCouleur).add(s);
+                    }
+                }
+            }
+        }
+        return coloration;
     }
 
     /**
@@ -478,11 +512,11 @@ public class Graphe {
     public boolean possedeSousGrapheComplet(int k) {
         //Regarder les classes de connexités
         //Pour chaque composante connexe :
-            //Trier les sommets en fonction de leur degré
-            //prendre les sommets de degré supérieur à k-1
-            //verifier pour chaque combinaison de sous graphe d'ordre 3 contenant ces sommets, si estComplet
-                //Si oui, alors true, Sinon continuer jusqu'à plus de combinaisons
-                //Passer à la composante connexe suivante
+        //Trier les sommets en fonction de leur degré
+        //prendre les sommets de degré supérieur à k-1
+        //verifier pour chaque combinaison de sous graphe d'ordre 3 contenant ces sommets, si estComplet
+        //Si oui, alors true, Sinon continuer jusqu'à 0 combinaison
+        //Passer à la composante connexe suivante
 
         check = false; //PRE INIT, variable globale pour stopper la recursivité
         //CAS EXTREME
@@ -506,8 +540,7 @@ public class Graphe {
             g = new Graphe(this, classe); //composante connexe de this
             if (g.estComplet() && g.getNbSommets() >= k) {
                 return true;
-            }
-            else if (!((g.estChaine() && k>2) || (g.estCycle() && k>3) || (g.estArbre()) && k>2)) {
+            } else if (!((g.estChaine() && k > 2) || (g.estCycle() && k > 3) || (g.estArbre()) && k > 2)) {
                 //Conditions pour rendre l'algo plus rapide, car sinon le temps augmente avec l'arborescence du graphe, or si
                 //le graphe est un arbre alors, il n'a pas de cycle et connexe (composant connexe toujours connexe),
                 //or un graphe complet d'ordre supérieur à 2 a forcément un cycle.
@@ -536,7 +569,7 @@ public class Graphe {
      * @param t
      * @return un ensemble de sommets qui forme un ensemble critique de plus petite taille entre {@code s} et {@code t}
      */
-    public Set<Sommet> getEnsembleCritique(Sommet s, Sommet t){
+    public Set<Sommet> getEnsembleCritique(Sommet s, Sommet t) {
         throw new RuntimeException("Méthode à implémenter");
     }
 
@@ -549,7 +582,7 @@ public class Graphe {
         if (sommets.isEmpty()) {
             return true;
         }
-        return estConnexe() && (getNbAretes() == getNbSommets()-1);
+        return estConnexe() && (getNbAretes() == getNbSommets() - 1);
     }
 
     /**
@@ -570,9 +603,9 @@ public class Graphe {
         for (int i = indiceCourrant; i <= ensembleInit.size() - k + ensembleCourrant.size(); i++) {
             ensembleCourrant.add(ensembleInit.get(i));
             if (!check) {
-                sousGrapheEstClique(ensembleInit, ensembleCourrant, i+1, k, sousGraphe);
+                sousGrapheEstClique(ensembleInit, ensembleCourrant, i + 1, k, sousGraphe);
             }
-            ensembleCourrant.remove(ensembleCourrant.size() -1);
+            ensembleCourrant.remove(ensembleCourrant.size() - 1);
         }
         return check;
     }
@@ -583,7 +616,7 @@ public class Graphe {
     public PriorityQueue<Sommet> getSommetsDegresDecroissant() {
         PriorityQueue<Sommet> sommetsDec = new PriorityQueue<>(
                 (Sommet s1, Sommet s2) ->
-                        degre(s2)==degre(s1) ?
+                        degre(s2) == degre(s1) ?
                                 Integer.compare(s1.getIndice(), s2.getIndice()) :
                                 Integer.compare(degre(s2), degre(s1))
         );
@@ -597,7 +630,7 @@ public class Graphe {
     public PriorityQueue<Sommet> getSommetsDegresCroissant() {
         PriorityQueue<Sommet> sommetsAsc = new PriorityQueue<>(
                 (Sommet s1, Sommet s2) ->
-                        degre(s2)==degre(s1) ?
+                        degre(s2) == degre(s1) ?
                                 Integer.compare(s1.getIndice(), s2.getIndice()) :
                                 Integer.compare(degre(s1), degre(s2))
         );
@@ -625,7 +658,7 @@ public class Graphe {
         PriorityQueue<Sommet> sommetsDesc = getSommetsDegresDecroissant();
         LinkedList<Sommet> res = new LinkedList<>();
         Sommet currSommet;
-        while (!sommetsDesc.isEmpty() && degre(currSommet = sommetsDesc.remove()) >= ordre-1) {
+        while (!sommetsDesc.isEmpty() && degre(currSommet = sommetsDesc.remove()) >= ordre - 1) {
             res.add(currSommet);
         }
         return res;
@@ -640,7 +673,7 @@ public class Graphe {
         LinkedList<Sommet> res = new LinkedList<>();
         Sommet currSommet;
         while (!sommetsAsc.isEmpty()) {
-            if (degre(currSommet = sommetsAsc.remove()) >= ordre-1) {
+            if (degre(currSommet = sommetsAsc.remove()) >= ordre - 1) {
                 res.add(currSommet);
             }
         }
@@ -657,5 +690,63 @@ public class Graphe {
             sequence.add(degre(sommetsAsc.remove()));
         }
         return sequence;
+    }
+
+    public Set<Sommet> getSommetsAyantNvoisinsDeEnsemble(Set<Sommet> ensemble, int n) {
+        Set<Sommet> res = new HashSet<>();
+        Set<Sommet> aExplorer = new HashSet<>(sommets);
+        aExplorer.removeAll(ensemble);
+        int countVoisin;
+
+        for (Sommet s : aExplorer) {
+            countVoisin = 0;
+            Iterator<Sommet> it = ensemble.iterator();
+            while(it.hasNext() && countVoisin < n) {
+                if (s.estVoisin(it.next())) {
+                    countVoisin++;
+                }
+            }
+            if (countVoisin == n) {
+                res.add(s);
+            }
+        }
+        return res;
+    }
+
+    public Sommet getSommetInclusDansUnTriangle() {
+        for (Sommet s : sommets) {
+            if (s.isInTriangle()) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public int calulerCouleur(Sommet s, Map<Integer, Set<Sommet>> coloration) {
+        boolean aTrouveCouleur = false;
+        int i = 1;
+        Iterator<Sommet> it;
+        Set<Sommet> current = coloration.get(i);
+        while (!aTrouveCouleur && !s.getVoisins().isEmpty()) {
+            boolean contientVoisin = false;
+            if (current == null) {
+                aTrouveCouleur = true;
+            } else {
+                it = s.getVoisins().iterator();
+                while (it.hasNext() && !contientVoisin) {
+                    if (current.contains(it.next())) {
+                        contientVoisin = true;
+                    }
+                }
+            }
+
+            if (!contientVoisin) {
+                aTrouveCouleur = true;
+            } else {
+                i++;
+                current = coloration.get(i);
+            }
+        }
+        return i;
     }
 }
