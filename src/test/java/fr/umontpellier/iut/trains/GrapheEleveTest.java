@@ -1621,10 +1621,133 @@ public class GrapheEleveTest {
         assertEquals(11, res4.size());
     }
 
+    //TEST NON TRAITE
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_triangle() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initChaine(3);
+
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_complet_4() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initSommet(4);
+        relierAllSommets();
+
+        assertFalse(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_deux_carre_non_connexe() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initCycle(4);
+        ajouterCycleNonReliee(4);
+
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_epee_bouclier_Vs_Illuminati() {
+        initCycle(6);
+        ajouterChaineNonReliee(5);
+
+        Set<Sommet> sommets = new HashSet<>(Set.of(
+                Sommet.sommetBuilder.setIndice(99).createSommet(),
+                Sommet.sommetBuilder.setIndice(98).createSommet(),
+                Sommet.sommetBuilder.setIndice(97).createSommet(),
+                Sommet.sommetBuilder.setIndice(69).createSommet()
+        ));
+        Graphe graphe = new Graphe(sommets);
+        graphe.ajouterArete(graphe.getSommet(99), graphe.getSommet(98));
+        graphe.ajouterArete(graphe.getSommet(99), graphe.getSommet(97));
+        graphe.ajouterArete(graphe.getSommet(97), graphe.getSommet(98));
+
+        assertTrue(g.possedeSousGrapheIsomorphe(g));
+        assertTrue(graphe.possedeSousGrapheIsomorphe(graphe));
+        assertFalse(g.possedeSousGrapheIsomorphe(graphe));
+        assertFalse(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_roue_a_6_pates() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initCycle(6);
+        Sommet pivot = Sommet.sommetBuilder.setIndice(99).createSommet();
+        g.ajouterSommet(pivot);
+        relierUnSommetATous(pivot);
+
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_vide() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initVide();
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_graine() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initSommet(1);
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_arete() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initChaine(2);
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_cycle_20() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initCycle(20);
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+    @Disabled
+    @Test
+    public void test_possedeSousGrapheIsomorphe_chaine_20() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        initChaine(20);
+        assertTrue(graphe.possedeSousGrapheIsomorphe(g));
+    }
+
+
 
 
     //Partie ci-dessous partagée par Franceus M.
-
     private Graphe getGrapheInduit() {
         Graphe graphe = new Graphe(0);
         graphe.ajouterSommet(new Sommet.SommetBuilder().setIndice(0).setSurcout(10).setNbPointsVictoire(2).setJoueurs(new HashSet<>(List.of(0, 1))).createSommet());
@@ -1687,36 +1810,5 @@ public class GrapheEleveTest {
             assertEquals(s.getJoueurs(), sommet.getJoueurs());
         }
         assertEquals(new HashSet<Sommet>(), g.getSommet(3).getVoisins());
-    }
-    //@Disabled
-    @Test
-    public void test_sous_graphe_Isomorphe_Cercle(){
-        initCycle(500);
-        assertTrue(g.possedeSousGrapheIsomorphe(g));
-    }
-    //@Disabled
-    @Test
-    public void test_sous_graphe_Isomorphe_chaine(){
-        initChaine(5);
-        assertTrue(g.possedeSousGrapheIsomorphe(g));
-    }
-    //@Disabled
-    @Test
-    public void test_sous_graphe_Isomorphe_vide(){
-        initVide();
-        assertFalse(g.possedeSousGrapheIsomorphe(g));
-    }
-    //@Disabled
-    @Test
-    public void test_sous_graphe_Isomorphe_tout_relier(){
-        initSommet(5);
-        relierAllSommets();
-        assertTrue(g.possedeSousGrapheIsomorphe(g));
-    }
-    //@Disabled
-    @Test
-    public void test_sous_graphe_Isomorphe_sans_lieson(){
-        initSommet(5);
-        assertFalse(g.possedeSousGrapheIsomorphe(g));
     }
 }

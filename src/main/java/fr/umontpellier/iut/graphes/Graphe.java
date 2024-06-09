@@ -558,28 +558,7 @@ public class Graphe {
      * @return true si et seulement si this possède un sous-graphe isomorphe à {@code g}
      */
     public boolean possedeSousGrapheIsomorphe(Graphe g) {
-        boolean value = false;
-        boolean fini = false;
-        int i = 0;
-        while (!value && !fini){
-            if (i >= g.getSommets().size()){
-                fini = true;
-            }else {
-                Set<Sommet> listSommets = g.getSommets();
-                listSommets.remove(g.getSommet(i));
-                Graphe graphe = new Graphe(g, listSommets);
-                if (graphe.getNbAretes() == 0){
-                    return false;
-                }
-
-                value = graphe.possedeUnIsthme();
-                if (!value){
-                    value = possedeSousGrapheIsomorphe(graphe);
-                }
-            }
-            i = i + 1;
-        }
-        return value;
+        throw new RuntimeException("Méthode à implémenter");
     }
 
     /**
