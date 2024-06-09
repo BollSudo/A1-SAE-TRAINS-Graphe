@@ -12,6 +12,7 @@ import java.util.*;
 public class Graphe {
     private final Set<Sommet> sommets;
     private boolean check = false;
+    private int minEnsCritique = Integer.MAX_VALUE;
 
     public Graphe(Set<Sommet> sommets) {
         this.sommets = sommets;
@@ -345,11 +346,9 @@ public class Graphe {
      * pré-requis : l'ensemble de départ et le sommet d'arrivée sont inclus dans l'ensemble des sommets de this
      */
     public int getDistance(Set<Sommet> depart, Sommet arrivee) {
-        int min = -1;
+        int min = Integer.MAX_VALUE;
         for (Sommet d : depart) {
-            if (min == -1 || min > getDistance(d, arrivee)) {
-                min = getDistance(d, arrivee);
-            }
+            min = Math.min(min, getDistance(d, arrivee));
         }
         return min;
     }
@@ -359,34 +358,32 @@ public class Graphe {
      */
 
     public int getDistance(Sommet depart, Sommet arrivee) {
-        Map<Sommet, Integer> sommetParcouru = new HashMap<>();
-        PriorityQueue<Sommet> valeurParcouru = new PriorityQueue<>(new Comparator<Sommet>() {
-            @Override
-            public int compare(Sommet o1, Sommet o2) {
-                return sommetParcouru.get(o1) - sommetParcouru.get(o2);
-            }
-        });
-        Set<Sommet> visiter = new HashSet<>();
-        sommetParcouru.put(depart, 0);
-        valeurParcouru.add(depart);
-        Sommet actuel = depart;
-        while (!valeurParcouru.isEmpty() && actuel != arrivee) {
-            actuel = valeurParcouru.poll();
-            visiter.add(actuel);
-            for (Sommet s : actuel.getVoisins()) {
-                if (!visiter.contains(s)) {
-                    if (sommetParcouru.containsKey(s)) {
-                        if (sommetParcouru.get(actuel) + s.getSurcout() < sommetParcouru.get(s)) {
+        try {
+            Map<Sommet, Integer> sommetParcouru = new HashMap<>();
+            PriorityQueue<Sommet> valeurParcouru = new PriorityQueue<>((o1, o2) -> sommetParcouru.get(o1) - sommetParcouru.get(o2));
+            Set<Sommet> visiter = new HashSet<>();
+            sommetParcouru.put(depart, 0);
+            sommetParcouru.put(arrivee, Integer.MAX_VALUE);
+            valeurParcouru.add(depart);
+            Sommet actuel = depart;
+            while (!valeurParcouru.isEmpty() && actuel != arrivee) {
+                actuel = valeurParcouru.poll();
+                visiter.add(actuel);
+                for (Sommet s : actuel.getVoisins()) {
+                    if (!visiter.contains(s)) {
+                        if (sommetParcouru.containsKey(s)) {
+                            if (sommetParcouru.get(actuel) + s.getSurcout() < sommetParcouru.get(s)) {
+                                sommetParcouru.put(s, sommetParcouru.get(actuel) + s.getSurcout());
+                            }
+                        } else {
                             sommetParcouru.put(s, sommetParcouru.get(actuel) + s.getSurcout());
+                            valeurParcouru.add(s);
                         }
-                    } else {
-                        sommetParcouru.put(s, sommetParcouru.get(actuel) + s.getSurcout());
-                        valeurParcouru.add(s);
                     }
                 }
             }
-        }
-        return sommetParcouru.get(arrivee);
+            return sommetParcouru.get(arrivee);
+        } catch (NullPointerException ignored) {return Integer.MAX_VALUE;}
     }
 
     /**
@@ -570,7 +567,10 @@ public class Graphe {
      * @return un ensemble de sommets qui forme un ensemble critique de plus petite taille entre {@code s} et {@code t}
      */
     public Set<Sommet> getEnsembleCritique(Sommet s, Sommet t) {
-        throw new RuntimeException("Méthode à implémenter");
+        minEnsCritique = Integer.MAX_VALUE; //reset
+        PriorityQueue<Set<Sommet>> ensDep = new PriorityQueue<>((o1, o2) -> o1.size()-o2.size());
+        calculerEnsCritiques(ensDep, new HashSet<>(), s, s, t);
+        return ensDep.peek();
     }
 
     //METHODES AJOUTEES =======================================================================
@@ -749,4 +749,25 @@ public class Graphe {
         }
         return i;
     }
+
+    public void calculerEnsCritiques(Collection<Set<Sommet>> ensDep, Set<Sommet> ensC, Sommet s, Sommet curr, Sommet t) {
+        ensC = new HashSet<>(ensC);
+        ensC.add(curr);
+        if (ensC.size() >= minEnsCritique) {
+            return;
+        }
+        if (curr.equals(t)) {
+            minEnsCritique = ensC.size();
+            ensC.remove(s);
+            ensC.remove(t);
+            ensDep.add(ensC);
+            return;
+        }
+        for (Sommet v : curr.getVoisins()) {
+            if (!ensC.contains(v)) {
+                calculerEnsCritiques(ensDep, ensC, s, v, t);
+            }
+        }
+    }
+
 }

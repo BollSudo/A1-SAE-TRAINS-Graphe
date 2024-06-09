@@ -1211,8 +1211,9 @@ public class GrapheEleveTest {
 //        assertFalse(g2.possedeSousGrapheIsomorphe(g));
         assertEquals(6, g1.degreMax());
         assertEquals(1, g2.degreMax());
+    }
 
-    }// @Disabled
+    // @Disabled
     @Test
     public void test_possedeUnIsthme_etoile(){
         initSommet(5);
@@ -1534,10 +1535,95 @@ public class GrapheEleveTest {
         }
     }
 
+    // @Disabled
+    @Test
+    public void test_distance_non_connexe() {
+        initSommet(2);
+
+        assertEquals(Integer.MAX_VALUE, g.getDistance(g.getSommet(0), g.getSommet(1)));
+    }
+
+    // @Disabled
+    @Test
+    public void test_distance_pas_meme_graphe() {
+        initSommet(1);
+        Sommet s0 = Sommet.sommetBuilder.setIndice(0).setSurcout(0).createSommet();
+
+        assertEquals(Integer.MAX_VALUE, g.getDistance(g.getSommet(0), s0));
+    }
+
+    // @Disabled
+    @Test
+    public void test_distance_null() {
+        initSommet(1);
+        Sommet s1 = null;
+
+        assertEquals(Integer.MAX_VALUE, g.getDistance(s1, null));
+    }
+
+    // @Disabled
+    @Test
+    public void test_distance_ens_depart_vide() {
+        initSommet(1);
+
+        assertEquals(Integer.MAX_VALUE, g.getDistance(new HashSet<>(), g.getSommet(0)));
+    }
+
+    // @Disabled
+    @Test
+    public void test_distance_carre() {
+        Sommet s0 = Sommet.sommetBuilder.setIndice(0).setSurcout(0).createSommet();
+        Sommet s1 = Sommet.sommetBuilder.setIndice(1).setSurcout(5).createSommet();
+        Sommet s2 = Sommet.sommetBuilder.setIndice(2).setSurcout(3).createSommet();
+        Sommet s3 = Sommet.sommetBuilder.setIndice(3).setSurcout(1).createSommet();
+        Set<Sommet> sommets = new HashSet<>(Set.of(s0,s1,s2,s3));
+        g = new Graphe(sommets);
+        ajouterAretePratique(0, 1);
+        ajouterAretePratique(0, 2);
+        ajouterAretePratique(2, 3);
+        ajouterAretePratique(1, 3);
+
+        assertEquals(4, g.getDistance(s0, s3));
+        assertEquals(1, g.getDistance(s1, s3));
+    }
+
+    // @Disabled
+    @Test
+    public void test_distances_tokyo_ensemble_critique() {
+        Jeu jeu = new Jeu(new String[]{"Rick", "Morty"}, new String[]{}, Plateau.OSAKA);
+        Graphe graphe = jeu.getGraphe();
+
+        Sommet s0 = graphe.getSommet(0);
+        Sommet t0 = graphe.getSommet(38);
+
+        Sommet s1 = graphe.getSommet(6);
+        Sommet t1 = graphe.getSommet(1);
+
+        Sommet s2 = graphe.getSommet(51);
+        Sommet t2 = graphe.getSommet(34);
+
+        Sommet s3 = graphe.getSommet(21);
+        Sommet t3 = graphe.getSommet(22);
+
+        Sommet s4 = graphe.getSommet(0);
+        Sommet t4 = graphe.getSommet(75);
+
+        Set<Sommet> res0 = graphe.getEnsembleCritique(s0, t0);
+        Set<Sommet> res1 = graphe.getEnsembleCritique(s1, t1);
+        Set<Sommet> res2 = graphe.getEnsembleCritique(s2, t2);
+        Set<Sommet> res3 = graphe.getEnsembleCritique(s3, t3);
+        Set<Sommet> res4 = graphe.getEnsembleCritique(s4, t4);
+
+        assertEquals(4, res0.size());
+        assertEquals(7, res1.size());
+        assertEquals(3, res2.size());
+        assertEquals(0, res3.size());
+        assertEquals(11, res4.size());
+    }
 
 
 
-    //Par Franceus M.
+    //Partie ci-dessous partagée par Franceus M.
 
     private Graphe getGrapheInduit() {
         Graphe graphe = new Graphe(0);
