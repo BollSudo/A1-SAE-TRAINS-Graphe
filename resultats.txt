@@ -1,0 +1,34 @@
+fr.umontpellier.iut.trains.GrapheSecretBasicTest
+ ✓  testAjouterSommet
+ ✓  testNbAretes
+ ✓  testNbSommets
+ ✓  testEnsembleDeSommets
+ ✓  testDegre
+  ✗ testSequenceEstGraphe
+ ✓  testEstUneChaine
+ ✓  testPossedUnCycle
+ ✓  testSupprimerArete
+ ✓  testEstUnCycle
+ ✓  testAjouterArete
+ ✓  testGetVoisins
+ ✓  testPossedUnIsthme
+ ✓  testDegreMax
+ ✓  testEstUneForet
+  ✗ testEstComplet
+fr.umontpellier.iut.trains.GrapheSecretComplexTest
+  ✗ testPossedeSousGrapheIsomorpheFacile
+ ✓  testPossedeSousGrapheComplet
+ ✓  testFusionnerSommets
+ ✓  testFusionnerSommets_4_sommets
+  ✗ testPossedeSousGrapheIsomorpheComplexe
+ ✓  testGetDistanceEnsemble
+  ✗ testEnsembleCritique
+  ✗ testColorationGloutonne
+ ✓  testGetDistance
+fr.umontpellier.iut.trains.GrapheTest
+ ✓  test_distances_tokyo
+ ✓  test_graphe_osaka
+ ✓  test_graphe_tokyo
+
+22 / 28 tests réussis
+Note: 16.42 / 20
